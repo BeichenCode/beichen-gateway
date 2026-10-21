@@ -1,0 +1,15 @@
+/* Task 111 — 数据看板实时胶囊呼吸点 (真实数据自动刷新的状态指示) */
+@keyframes dash-live-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  70% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}

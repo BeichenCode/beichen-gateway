@@ -1,0 +1,240 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// 用户表
+// ============================================================
+model User {
+  id            Int       @id @default(autoincrement())
+  username      String    @unique
+  password      String // scrypt hash
+  displayName   String    @default("")
+  role          Int       @default(1) // 1=普通用户 10=管理员 100=root
+  status        Int       @default(1) // 1=已激活 2=已禁用
+  email         String    @default("")
+  // 额度: 500000 quota = 1 USD (QuotaPerUnit)
+  quota         BigInt    @default(0)
+  usedQuota     BigInt    @default(0)
+  requestCount  Int       @default(0)
+  group         String    @default("default") // 用户分组
+  inviterId     Int?      // 邀请人
+  affCode       String    @unique // 邀请码
+  affCount      Int       @default(0)
+  affHistoryQuota BigInt  @default(0) // 累计邀请奖励
+  createdAt     DateTime  @default(now())
+  lastLoginTime DateTime?
+  tokenVersion  Int       @default(0) // 会话版本: 改密/禁用时 +1 使全部 JWT 立即失效 (Task 82 会话吊销)
+  tokens        Token[]
+  logs          Log[]
+
+  @@index([role])
+  @@index([status])
+}
+
+// ============================================================
+// 渠道表 (上游供应商)
+// ============================================================
+model Channel {
+  id           Int       @id @default(autoincrement())
+  name         String
+  type         Int       @default(1) // 1=OpenAI 8=自定义 14=Claude 24=Gemini 25=DeepSeek 15=通义千问 17=文心 24=Gemini...
+  baseUrl      String    @default("")
+  key          String // 上游 API Key (可多行,逗号/换行分隔轮询)
+  models       String    @default("") // 逗号分隔的模型列表
+  groups       String    @default("default") // 逗号分隔的分组
+  priority     Int       @default(0) // 优先级,越大越优先
+  weight       Int       @default(0) // 同优先级下的加权随机权重
+  status       Int       @default(1) // 1=启用 2=手动禁用 3=自动禁用
+  usedQuota    BigInt    @default(0)
+  balance      Float     @default(0) // 上游余额
+  responseTime Int       @default(0) // 最近测试响应时间 ms
+  testTime     DateTime? // 最近测试时间
+  autoBan      Int       @default(1) // 1=失败自动禁用 0=不自动禁用
+  other        String    @default("") // 其他参数 JSON
+  remark       String    @default("")
+  createdAt    DateTime  @default(now())
+
+  @@index([status])
+  @@index([priority])
+}
+
+// ============================================================
+// 令牌表 (API Key, sk-xxx)
+// ============================================================
+model Token {
+  id           Int       @id @default(autoincrement())
+  name         String
+  key          String    @unique
+  userId       Int
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status       Int       @default(1) // 1=启用 2=禁用 3=过期 4=耗尽
+  quota        BigInt    @default(500000) // 目标额度, unlimited=true 表示无限
+  usedQuota    BigInt    @default(0)
+  unlimitedQuota Boolean @default(false)
+  expiredTime  DateTime? // null = 永不过期
+  models       String    @default("") // 限制模型,空=不限
+  groups       String    @default("") // 限制分组,空=跟随用户分组
+  ipLimit      String    @default("") // IP 白名单,逗号分隔,空=不限
+  requestCount Int       @default(0)
+  createdAt    DateTime  @default(now())
+  lastUsedAt   DateTime?
+
+  @@index([userId])
+  @@index([key])
+}
+
+// ============================================================
+// 日志表
+// ============================================================
+model Log {
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  username        String   @default("")
+  type            Int      @default(2) // 1=充值 2=消费 3=管理 4=系统
+  channelId       Int?
+  channelName     String   @default("")
+  tokenName       String   @default("")
+  modelName       String   @default("")
+  promptTokens    Int      @default(0)
+  completionTokens Int     @default(0)
+  totalTokens     Int      @default(0)
+  useTime         Int      @default(0) // 耗时 ms
+  ttft            Int?     // 首字延迟 ms (Task 161: 流式=首个上游数据块到达, 非流式=响应头到达; 旧行为 NULL)
+  isStream        Boolean  @default(false)
+  quota           BigInt   @default(0) // 消耗额度
+  content         String   @default("") // 详情/备注
+  ip              String   @default("") // 客户端真实 IP (Task 152: cf-connecting-ip 优先, 看板实时在线按 IP 去重)
+  country         String   @default("") // 国家归属 ISO alpha-2 (Task 154: CF-IPCountry 落库, 日志/看板显示中文地区)
+  createdAt       DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([type])
+  @@index([modelName])
+}
+
+// ============================================================
+// 兑换码表
+// ============================================================
+model Redemption {
+  id        Int       @id @default(autoincrement())
+  name      String    @default("")
+  key       String    @unique
+  quota     BigInt // 兑换额度
+  status    Int       @default(1) // 1=未使用 2=已禁用 3=已被兑换
+  userId    Int?      // 兑换人
+  username  String    @default("")
+  createdAt DateTime  @default(now())
+  usedAt    DateTime?
+}
+
+// ============================================================
+// 系统设置表 (K-V)
+// ============================================================
+model Option {
+  key   String @id
+  value String
+}
+
+// ============================================================
+// 充值订单表 (易支付在线充值闭环)
+// ============================================================
+model TopupOrder {
+  id        Int       @id @default(autoincrement())
+  orderNo   String    @unique // 平台订单号
+  userId    Int
+  username  String    @default("")
+  amount    BigInt // 充值额度 (quota)
+  money     Float // 实付金额 (CNY)
+  status    Int       @default(1) // 1=待支付 2=已完成 3=已关闭
+  payType   String    @default("") // alipay / wxpay / qqpay
+  tradeNo   String    @default("") // 易支付流水号
+  createdAt DateTime  @default(now())
+  paidAt    DateTime?
+
+  @@index([userId])
+  @@index([status])
+}
+
+// ============================================================
+// 模型定价表
+// ============================================================
+model ModelRatio {
+  id               Int     @id @default(autoincrement())
+  modelName        String  @unique
+  ratio            Float   @default(1) // 模型倍率: 1倍率 = $0.002/1K tokens
+  completionRatio  Float   @default(1) // 补全倍率(相对模型倍率)
+  modelPrice       Float   @default(-1) // 按次计费价格(USD), >=0 时优先
+  enableGroup      String  @default("") // 可用分组,空=不限
+  description      String  @default("")
+  quotaType        Int     @default(0) // 0=按量计费 1=按次计费
+  createdAt        DateTime @default(now())
+}
+
+// ============================================================
+// 邮箱验证码 (Task 80: 注册邮箱验证)
+// ============================================================
+model EmailCode {
+  id        Int       @id @default(autoincrement())
+  email     String
+  codeHash  String // scrypt hash, 不存明文
+  purpose   String    @default("register")
+  ip        String    @default("")
+  attempts  Int       @default(0) // 校验失败次数, 达到上限后作废
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([email, purpose, createdAt])
+}
+
+// ============================================================
+// 模型健康表 (Task 206: 探测驱动的模型自动上下架)
+// ============================================================
+model ModelHealth {
+  id             Int       @id @default(autoincrement())
+  modelName      String    @unique
+  status         Int       @default(1) // 1=在售(在列表) 0=已自动下架(列表隐藏, 调用不封禁)
+  failStreak     Int       @default(0) // 连续坏轮数 (探测失败 或 首字超 HealthTtftMs 阈值)
+  okStreak       Int       @default(0) // 连续好轮数 (探测成功且首字达标)
+  lastTtftMs     Int?      // 最近一轮探测首字延迟 ms (失败轮保留上一次成功值)
+  lastOkAt       DateTime? // 最近一次探测成功时刻
+  lastFailAt     DateTime? // 最近一次探测失败时刻
+  lastFailReason String    @default("") // 最近失败原因 (HTTP 5xx / 超时 / 首字超阈值), 供后台徽章 title
+  lastDownAt     DateTime? // 最近一次自动下架时刻
+  lastUpAt       DateTime? // 最近一次自动恢复上架时刻
+  rounds         Int       @default(0) // 累计评估轮数
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([status])
+}
+
+// ============================================================
+// 工单系统 (Task 103: 用户售后工单 + 自动方案 + 管理员邮件同步)
+// ============================================================
+model Ticket {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  username  String    @default("") // 冗余快照, 防用户改名后失联
+  category  String // 问题分类 key (ticket-cats)
+  title     String
+  detail    String // 用户补充描述 (订单号/令牌名/报错信息等)
+  contact   String    @default("") // 可选回访方式 (QQ 号等)
+  autoHint  String    @default("") // 提交前已展示的自动方案 (分类 key)
+  status    Int       @default(1) // 1=待处理 2=处理中 3=已解决 4=已关闭
+  reply     String    @default("") // 管理员回复
+  repliedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+}

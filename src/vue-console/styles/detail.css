@@ -1,0 +1,129 @@
+/**
+ * Task 203-a — 控制台细节精修层 (detail.css)
+ *
+ * 定位: 控制台专属的「细节层」CSS, 由 theme.ts 紧跟 theme-vt.css 引入。
+ * 红线 (本文件自我约束, 与任务要求一一对应):
+ *   1. 所有选择器限定在 #vue-console-root 作用域内 — 前台官网共用 globals.css, 零影响;
+ *      (naive 传送门组件如弹窗/抽屉/下拉渲染在 body 下, 其观感一律走 theme.ts 的
+ *       GlobalThemeOverrides 组件键, 不在此处用全局选择器追杀)
+ *   2. 圆角零硬编码: 引用组件自带的 --n-border-radius 变量 (值 = theme.ts themeRadius 通道);
+ *   3. 动效纪律 (Task 198): 只过渡 transform / border-color / background-color /
+ *      box-shadow(静态) / 伪元素 opacity, 禁 hover 大 blur 大扩散阴影;
+ *   4. 滚动条样式归 styles/scrollbar.css, 此处不重复;
+ *   5. 亮暗双套成立: 需要分档处用 html.dark 前缀;
+ *   6. 全部新增动效包 @media (prefers-reduced-motion: reduce) 降级。
+ */
+
+/* ── 1. 数字等宽 ──────────────────────────────────────────────────────
+   表格数字列 / 分页器 / 卡片统计数字全部 tabular-nums, 翻页与轮询刷新时
+   数字不再左右轻跳 (仪表盘 5s 轮询 + tween 滚动场景尤其明显)。 */
+#vue-console-root .n-data-table,
+#vue-console-root .n-pagination,
+#vue-console-root .n-card {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 2. 表格行 hover 过渡 + 表头微字距 ────────────────────────────────
+   naive 悬浮行变色是瞬时跳变; 0.15s 的 background-color 过渡让鼠标扫过
+   行时反馈柔和 (只过渡背景色, 无布局属性, 合成安全)。表头 0.2px 字距提升
+   中文字表头的一点点「印刷感」。 */
+#vue-console-root .n-data-table .n-data-table-td {
+  transition: background-color 0.15s ease;
+}
+
+#vue-console-root .n-data-table .n-data-table-th {
+  letter-spacing: 0.2px;
+}
+
+/* ── 3. 控件描边过渡时长收敛 (次级按钮 hover 描边 / Input / Select) ───
+   naive 默认 0.3s cubic-bezier 略拖沓; 描边/聚焦环统一 0.2s ease,
+   只动 border-color 与 box-shadow 两个非布局属性。 */
+#vue-console-root .n-input .n-input__border,
+#vue-console-root .n-input .n-input__state-border,
+#vue-console-root .n-base-selection .n-base-selection__border,
+#vue-console-root .n-base-selection .n-base-selection__state-border,
+#vue-console-root .n-button .n-button__border,
+#vue-console-root .n-button .n-button__state-border {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* ── 4. focus-visible 键盘焦点环 ──────────────────────────────────────
+   按钮/链接的键盘可达性: naive 按钮无默认 focus 环, 鼠标点击不触发
+   (:focus-visible 语义), Tab 导航时显示主色 2px 外环。颜色取
+   --soy-primary-color (theme.ts 通道, 跟随主题抽屉改色)。 */
+#vue-console-root :where(button, a):focus-visible {
+  outline: 2px solid var(--soy-primary-color, #646cff);
+  outline-offset: 2px;
+}
+
+/* ── 5. 卡片标题区次级信息与内容区层级 ────────────────────────────────
+   header-extra (如「近 14 天」) 统一压为 muted-foreground, 与页面正文字色
+   token 同源; naive 默认 textColor3 与之等值, 显式声明保证亮暗两套一致。 */
+#vue-console-root .n-card > .n-card-header .n-card-header__extra {
+  color: var(--muted-foreground);
+}
+
+/* ── 6. 日志展开代码块 (logs.ts renderDetail 产出) 亮暗双套精修 ───────
+   原样式为裸深底块: 补 1px 边框 + 圆角走 --n-border-radius 通道, 暗色下
+   边框提亮一档保证与卡片底的分离度; 深底等宽字配色不变 (可读性良好)。 */
+#vue-console-root .log-codeblock {
+  border-radius: var(--n-border-radius, 2px);
+  border: 1px solid rgba(15, 23, 42, 0.14);
+}
+
+html.dark #vue-console-root .log-codeblock {
+  border-color: rgba(255, 255, 255, 0.09);
+}
+
+/* ── 7. 表格空态 (EmptyState 换装后) 与表格底边的呼吸 ─────────────────
+   naive 空态容器 padding 走 DataTable.emptyPadding override (40px 0),
+   这里只把空态说明文字与图标的间距统一为 8px。 */
+#vue-console-root .n-data-table .n-empty .n-empty__description {
+  margin-top: 8px;
+}
+
+/* ── 8. reduced-motion 降级: 本文件新增的全部过渡归零 ────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  #vue-console-root .n-data-table .n-data-table-td,
+  #vue-console-root .n-input .n-input__border,
+  #vue-console-root .n-input .n-input__state-border,
+  #vue-console-root .n-base-selection .n-base-selection__border,
+  #vue-console-root .n-base-selection .n-base-selection__state-border,
+  #vue-console-root .n-button .n-button__border,
+  #vue-console-root .n-button .n-button__state-border {
+    transition: none;
+  }
+}
+
+/* ══ Task 203-b (第二批页面级收尾) ══════════════════════════════════ */
+
+/* ── 9. 独立空态 (非表格内) 的图标—说明间距与表格内空态统一 ────────────
+   203-a 第 7 段只统一了 n-data-table 内的空态; 商城搜索无结果 / 兑换中心
+   到账记录 / 工单中心暂无工单等页面级独立 n-empty (EmptyState 换装) 仍走
+   naive 默认 12px, 同页两种节奏 — 统一为 8px (与表格内一致, 选择器为超集,
+   第 7 段自然被覆盖合并, 无冲突)。 */
+#vue-console-root .n-empty .n-empty__description {
+  margin-top: 8px;
+}
+
+/* ══ Task 204 (移动端适配专项) ══════════════════════════════════════ */
+
+/* ── 10. 横向滚动 tabs 两端渐隐提示 ─────────────────────────────────
+   系统设置等页的 n-tabs (segment) 在窄屏溢出可滚 (v-x-scroll), 右端页签
+   被硬裁无任何「还能拖」的暗示; 与页签栏 tab-mask 同语言, 静态两端 20px
+   渐隐 (滚动容器自宽 ≤ 视口时不溢出, 渐隐不明显, 无需 JS 动态挂载)。 */
+#vue-console-root .v-x-scroll {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 20px, #000 calc(100% - 20px), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 20px, #000 calc(100% - 20px), transparent 100%);
+}
+
+/* ── 11. 窄屏 (≤767px) 表格密度收紧 ────────────────────────────────
+   n-data-table small 档 cell padding 仍 12px, 375px 下每列白白吃掉 24px;
+   窄屏压到 8px, 同等列宽下多露出 ~5% 内容, 减轻横向拖动量。 */
+@media (max-width: 767px) {
+  #vue-console-root .n-data-table .n-data-table-th,
+  #vue-console-root .n-data-table .n-data-table-td {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}

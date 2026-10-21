@@ -1,0 +1,108 @@
+/* 官方 src/styles/css/transition.css 移植 — 页面切换动画六套 (GlobalContent
+   <Transition :name="pageAnimateMode" mode="out-in"> 引用, 类名与官方同名)
+   Task 153: 全套提速 — 官方 0.3s 双段 (out-in 模式下 leave+enter 叠加到 0.6s,
+   页签来回切换「拖泥带水」) 统一压到 0.12~0.16s, 切页更跟手 */
+
+/* fade */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.14s ease-in-out;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* fade-slide (默认切页动画) — Task 154 二次提速:
+   位移已裁, 但 transform 仍要在巨型页面 (ECharts/大表格) 上触发合成层重排,
+   掉帧的主观感受就是「不连贯」; opacity 是纯合成器属性, 任何页面都零重排。
+   另: 历史遗留 — 页面组件曾挂 tailwind transition duration-300 (已被移除),
+   它曾把这里的 0.12s 覆盖回 0.3s, 是「改了时长却没变快」的真凶 */
+.fade-slide-leave-active,
+.fade-slide-enter-active {
+  transition: opacity 0.12s ease-out;
+}
+.fade-slide-enter-from {
+  opacity: 0;
+}
+.fade-slide-leave-to {
+  opacity: 0;
+}
+
+/* fade-bottom */
+.fade-bottom-enter-active,
+.fade-bottom-leave-active {
+  transition:
+    opacity 0.12s,
+    transform 0.15s;
+}
+.fade-bottom-enter-from {
+  opacity: 0;
+  transform: translateY(-10%);
+}
+.fade-bottom-leave-to {
+  opacity: 0;
+  transform: translateY(10%);
+}
+
+/* fade-scale */
+.fade-scale-leave-active,
+.fade-scale-enter-active {
+  transition: all 0.14s;
+}
+.fade-scale-enter-from {
+  opacity: 0;
+  transform: scale(1.1);
+}
+.fade-scale-leave-to {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+/* zoom-fade */
+.zoom-fade-enter-active,
+.zoom-fade-leave-active {
+  transition:
+    transform 0.12s,
+    opacity 0.15s ease-out;
+}
+.zoom-fade-enter-from {
+  opacity: 0;
+  transform: scale(0.95);
+}
+.zoom-fade-leave-to {
+  opacity: 0;
+  transform: scale(1.03);
+}
+
+/* zoom-out */
+.zoom-out-enter-active,
+.zoom-out-leave-active {
+  transition:
+    opacity 0.1s ease-in-out,
+    transform 0.15s ease-out;
+}
+.zoom-out-enter-from,
+.zoom-out-leave-to {
+  opacity: 0;
+  transform: scale(0);
+}
+
+/* Task 152: 模型商城卡片列表动画 (transition-group name="mall-card")
+   此前 CSS 缺失 — Vue 每次列表更新都对每张卡做无效动画探测 (强制 reflow), 切换发涩;
+   补轻量淡入上浮 + FLIP move 平滑, 仅 150ms 不抢注意力 */
+.mall-card-enter-active {
+  transition:
+    opacity 0.15s ease-out,
+    transform 0.15s ease-out;
+}
+.mall-card-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
+.mall-card-leave-active {
+  display: none; /* 筛选切换时直接摘除, 不占位不闪跳 */
+}
+.mall-card-move {
+  transition: transform 0.2s ease;
+}

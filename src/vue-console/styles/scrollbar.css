@@ -1,0 +1,49 @@
+/* 官方 src/styles/scss/scrollbar.scss mixin 落地版 (AdminLayout #__SCROLL_EL_ID__ 同款)
+   - scrollbar-width thin + scrollbar-color 半透明拇指/透明轨道
+   - webkit: 7px 宽高, 拇指 rgba(0,0,0,.5) (暗色 rgba(255,255,255,.5)), 轨道透明 */
+.soy-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.5) transparent;
+}
+
+.dark .soy-scrollbar {
+  /* guide safari use light color scrollbar (官方注释) */
+  color-scheme: dark;
+  scrollbar-color: rgba(255, 255, 255, 0.5) transparent;
+}
+
+.soy-scrollbar::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+.soy-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 7px;
+}
+.soy-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+.soy-scrollbar::-webkit-scrollbar-track-piece {
+  background-color: rgba(0, 0, 0, 0);
+  border-radius: 0;
+}
+
+.dark .soy-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+.dark .soy-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+/* ── Task 137: 移动端后台无法滑动 Bug 修复 ──
+ * 根因: naive-ui 未分层规则 `.n-menu { overflow: hidden }` 压过 Tailwind v4 分层工具类
+ * `.overflow-y-auto` (@layer utilities 优先级永远低于未分层样式) — 菜单条目超出容器高度时
+ * 永远滚不动: 移动端抽屉 (管理员 18 项 ≈ 912px > 视口) 下半功能完全不可达,
+ * 桌面矮窗口同样中招。用更高优先级的未分层选择器显式恢复滚动。
+ * 实测 (CDP touchEvent): 修复前 scrollTop 恒 0, 修复后正常滚动。 */
+.n-menu.soy-scrollbar {
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}

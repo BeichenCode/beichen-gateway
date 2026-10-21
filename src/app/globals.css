@@ -1,0 +1,1769 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  /* naive-ui 实测 (官方 demo eval): common borderRadius 3px / small 2px, 卡片 8px (rounded-8px class) */
+  --radius-sm: 0.125rem;
+  --radius-md: 0.1875rem;
+  --radius-lg: 0.1875rem;
+  --radius-xl: 0.5rem;
+  --radius-2xl: 0.75rem;
+  --radius-3xl: 0.75rem;
+  --radius-4xl: 1rem;
+}
+
+/* ============ SoybeanAdmin 主题 (亮色) — 令牌取自官方 settings.ts + naive-ui commonLight ============ */
+:root {
+  /* layout rgb(247,250,252) / container #fff / base-text rgb(31,31,31) */
+  --background: rgb(247, 250, 252);
+  --foreground: rgb(31, 31, 31);
+  --card: #ffffff;
+  --card-foreground: rgb(31, 31, 31);
+  --popover: #ffffff;
+  --popover-foreground: rgb(31, 31, 31);
+  /* themeColor #2080f0 (商务蓝, naive-ui 正蓝), 派生取自官方 demo 实测 + naive 自家色系双重验证:
+     Hover = antd 索引 5 (变浅, naive 官方蓝 hover #4098fc 同系) / Pressed = 索引 7 (变深) */
+  --primary: #2080f0;
+  --primary-hover: #4aa3fd;
+  --primary-pressed: #1161ca;
+  --primary-foreground: #ffffff;
+  --secondary: rgb(243, 243, 245);
+  --secondary-foreground: rgb(51, 54, 57);
+  --muted: rgb(243, 243, 245);
+  --muted-foreground: rgb(118, 124, 130);
+  --accent: rgb(243, 243, 245);
+  --accent-foreground: rgb(31, 31, 31);
+  /* otherColor: success/warning/error 为 Ant 系, info 跟随主色 (isInfoFollowPrimary); hover/pressed 同 antd 索引 5/7 派生 */
+  --success: #52c41a;
+  --success-hover: #73d13d;
+  --success-pressed: #389e0d;
+  --warning: #faad14;
+  --warning-hover: #ffc53d;
+  --warning-pressed: #d48806;
+  --error: #f5222d;
+  --error-hover: #ff4c4f;
+  --error-pressed: #cf1222;
+  --destructive: #f5222d;
+  /* borderColor rgb(224,224,230) / dividerColor rgb(239,239,245) */
+  --divider: rgb(239, 239, 245);
+  --border: rgb(224, 224, 230);
+  --input: rgb(224, 224, 230);
+  --ring: #2080f0;
+  --chart-1: #2080f0;
+  --chart-2: #52c41a;
+  --chart-3: #faad14;
+  --chart-4: #f5222d;
+  --chart-5: #74beff;
+  --sidebar: #ffffff;
+  --sidebar-foreground: rgb(31, 31, 31);
+  --sidebar-primary: #2080f0;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(32, 128, 240, 0.1);
+  --sidebar-accent-foreground: #2080f0;
+  --sidebar-border: rgb(239, 239, 245);
+  --sidebar-ring: #2080f0;
+  /* SoybeanAdmin tokens.light.boxShadow */
+  --sb-shadow-header: 0 1px 2px rgb(0, 21, 41, 0.08);
+  --sb-shadow-sider: 2px 0 8px 0 rgb(29, 35, 41, 0.05);
+  /* chrome 标签页 active 底色: @sa/color transformColorWithOpacity(primary, 0.1, #fff) */
+  /* 深色侧边栏 (sider.inverted): 官方 tokens.light inverted */
+  --sb-sider-inverted: rgb(0, 20, 40);
+  /* 代码块渐变终点 (about 页 API 文档; 暗色由 .dark 覆写) */
+  --code-soft: rgba(243, 247, 255, 0.6);
+}
+
+/* ============ SoybeanAdmin 主题 (暗色) — naive dark: layout rgb(18,18,18) / container rgb(28,28,28) / popover rgb(72,72,78) ============ */
+html.dark {
+  /* 代码块渐变终点: 暗色下用极弱白躁避免发灰发白 (独立选择器, 防被规则合并优化吞掉) */
+  --code-soft: rgba(255, 255, 255, 0.05);
+}
+
+.dark {
+  --background: rgb(18, 18, 18);
+  --foreground: rgb(224, 224, 224);
+  --card: rgb(28, 28, 28);
+  --card-foreground: rgb(224, 224, 224);
+  --popover: rgb(72, 72, 78);
+  --popover-foreground: rgb(224, 224, 224);
+  --primary: #2080f0;
+  --primary-hover: #4aa3fd;
+  --primary-pressed: #1161ca;
+  --primary-foreground: #ffffff;
+  --secondary: rgba(255, 255, 255, 0.06);
+  --secondary-foreground: rgba(255, 255, 255, 0.82);
+  --muted: rgba(255, 255, 255, 0.06);
+  --muted-foreground: rgba(255, 255, 255, 0.52);
+  --accent: rgba(255, 255, 255, 0.06);
+  --accent-foreground: rgb(224, 224, 224);
+  --success: #52c41a;
+  --success-hover: #73d13d;
+  --success-pressed: #389e0d;
+  --warning: #faad14;
+  --warning-hover: #ffc53d;
+  --warning-pressed: #d48806;
+  --error: #f5222d;
+  --error-hover: #ff4c4f;
+  --error-pressed: #cf1222;
+  --destructive: #f5222d;
+  --divider: rgba(255, 255, 255, 0.09);
+  --border: rgb(61, 61, 61);
+  --input: rgb(61, 61, 61);
+  --ring: #2080f0;
+  --chart-1: #4aa3fd; /* palette(400) 暗色提亮 */
+  --chart-2: #63e225;
+  --chart-3: #fbbb3c;
+  --chart-4: #f74952;
+  --chart-5: #74beff;
+  --sidebar: rgb(28, 28, 28);
+  --sidebar-foreground: rgb(224, 224, 224);
+  --sidebar-primary: #2080f0;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(32, 128, 240, 0.15); /* naive dark menu: primary @ 0.15 */
+  --sidebar-accent-foreground: #4aa3fd;
+  --sidebar-border: rgba(255, 255, 255, 0.09);
+  --sidebar-ring: #2080f0;
+  --sb-shadow-header: 0 1px 2px rgba(0, 0, 0, 0.24);
+  --sb-shadow-sider: 2px 0 8px 0 rgba(0, 0, 0, 0.2);
+  /* 暗色 chrome 标签 active: transformColorWithOpacity(primary, 0.3, #141414) */
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    scroll-behavior: smooth;
+    /* 防止任何元素撑出横向滚动条 (clip 不产生滚动容器, 优于 hidden) */
+    overflow-x: clip;
+    /* Task 56: 关闭移动端字体膨胀 — 夸克/UC 等壳浏览器会把 <pre> 等宽文本块
+       强行放大到 ~14px, 造成 Hero 代码窗长行溢出截断; 100% = 按设定字号渲染 */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-background text-foreground;
+    overflow-x: clip;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  }
+}
+
+/* Naive UI 风格滚动条 (scrollbarWidth 5px) */
+.naive-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+.naive-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.naive-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(124, 128, 135, 0.3);
+  border-radius: 3px;
+}
+.naive-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(124, 128, 135, 0.5);
+}
+
+/* 菜单项过渡 (naive cubicBezierEaseInOut) — 放入 components 层,
+   避免未分层 CSS 压过 utilities 的 transition-all (曾致侧边栏折叠无动画) */
+@layer components {
+  .sb-menu-item {
+    transition:
+      background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* login 渐变插画区 */
+.login-banner-bg {
+  background: linear-gradient(135deg, rgba(32, 128, 240, 0.25) 0%, rgba(74, 163, 253, 0.12) 100%), rgb(16, 16, 20);
+}
+
+/* 表单输入 (naive n-input: heightMedium 34px, hover/focus border primaryHover, focus ring primary@0.2)
+   放入 components 层: 让 utilities 的 pl-10 / pr-11 / h-11 等能正常覆盖 (修复图标压字/高度覆盖) */
+@layer components {
+  .sb-input {
+    height: 2.125rem;
+    width: 100%;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--input);
+    background: var(--card);
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    outline: none;
+    transition: border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .sb-input:hover {
+    border-color: var(--primary-hover);
+  }
+  .sb-input:focus {
+    border-color: var(--primary-hover);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 20%, transparent);
+  }
+  .sb-input::placeholder {
+    color: rgb(194, 194, 197);
+  }
+  .dark .sb-input::placeholder {
+    color: rgba(255, 255, 255, 0.38);
+  }
+  select.sb-input {
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 2rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23767c82' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.625rem center;
+  }
+  select.sb-input option {
+    background: var(--card);
+    color: var(--foreground);
+  }
+  textarea.sb-input {
+    height: auto;
+    padding-top: 0.5rem;
+  }
+  /* 表单字段内联错误态 (Task 91): naive errorColor, 明暗双主题 — 取代 toast 弹窗 */
+  .sb-input--error,
+  .sb-input--error:hover {
+    border-color: #d03050;
+  }
+  .sb-input--error:focus {
+    border-color: #d03050;
+    box-shadow: 0 0 0 2px color-mix(in srgb, #d03050 20%, transparent);
+  }
+  .dark .sb-input--error,
+  .dark .sb-input--error:hover {
+    border-color: #e88080;
+  }
+  .dark .sb-input--error:focus {
+    border-color: #e88080;
+    box-shadow: 0 0 0 2px color-mix(in srgb, #e88080 20%, transparent);
+  }
+  .sb-field-err {
+    color: #d03050;
+  }
+  .dark .sb-field-err {
+    color: #e88080;
+  }
+  /* 人机验证条 spinner (Task 90 极简验证条) */
+  .hc-spinner {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: 2px solid var(--primary);
+    border-top-color: transparent;
+    animation: hc-spin 0.7s linear infinite;
+  }
+  @keyframes hc-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  /* 验证失败抖动 (Task 120 拼图, Task 129 点击条沿用) */
+  @keyframes hc-shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    20% {
+      transform: translateX(-7px);
+    }
+    40% {
+      transform: translateX(6px);
+    }
+    60% {
+      transform: translateX(-4px);
+    }
+    80% {
+      transform: translateX(3px);
+    }
+  }
+  /* ===== 点击式人机验证条 (Task 129): 扫光 / 圆环 / 绿勾描边 / 光晕 / 弹跳 ===== */
+  /* idle 态边框扫光: 引导点击的微动效 */
+  .hc-bar--idle::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 56px;
+    left: -70px;
+    background: linear-gradient(
+      105deg,
+      transparent,
+      color-mix(in srgb, var(--primary) 13%, transparent),
+      transparent
+    );
+    animation: hc-shine 2.8s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes hc-shine {
+    0% {
+      left: -70px;
+    }
+    55% {
+      left: 110%;
+    }
+    100% {
+      left: 110%;
+    }
+  }
+  /* idle 态左侧空心圆环 (Turnstile 式确认目标), hover 染主色 */
+  .hc-ring {
+    width: 18px;
+    height: 18px;
+    border-radius: 9999px;
+    border: 2px solid var(--input);
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+  .hc-bar--idle:hover .hc-ring {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 15%, transparent);
+  }
+  .hc-shake-x {
+    animation: hc-shake 0.45s ease;
+  }
+  /* 验证成功: 圆环描边 (r=8 周长≈51) + 对勾描边 (路径长≈9.5) + 光晕脉冲 + 整条弹跳 */
+  .hc-check-svg .hc-c {
+    stroke-dasharray: 51;
+    stroke-dashoffset: 51;
+    animation: hc-draw 0.5s ease-out forwards;
+  }
+  .hc-check-svg .hc-k {
+    stroke-dasharray: 10;
+    stroke-dashoffset: 10;
+    animation: hc-draw 0.32s ease-out 0.42s forwards;
+  }
+  @keyframes hc-draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  .hc-halo {
+    animation: hc-halo 1.5s ease-out 0.3s 2;
+  }
+  @keyframes hc-halo {
+    0% {
+      opacity: 0.55;
+      transform: scale(0.7);
+    }
+    70% {
+      opacity: 0;
+      transform: scale(1.55);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(1.55);
+    }
+  }
+  .hc-pop {
+    animation: hc-pop 0.5s cubic-bezier(0.22, 1.4, 0.36, 1);
+  }
+  @keyframes hc-pop {
+    0% {
+      transform: scale(0.96);
+    }
+    55% {
+      transform: scale(1.012);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  /* 动效减免: 描边直达终点, 装饰动画停用 */
+  @media (prefers-reduced-motion: reduce) {
+    .hc-bar--idle::before,
+    .hc-halo,
+    .hc-pop,
+    .hc-shake-x {
+      animation: none;
+    }
+    .hc-check-svg .hc-c,
+    .hc-check-svg .hc-k {
+      animation-duration: 0.01s;
+      animation-delay: 0s;
+    }
+  }
+}
+
+/* ============ 官网 / 登录页 专属样式 ============ */
+
+/* ============ 官网 v12 (工程白: Vercel / Linear 式基建产品语言) ============ */
+/* 去 AI 味纪律: 零渐变字 / 零极光 / 零光晕 / 零胶囊徽章 / 零 Bento; 结构感来自发丝线 + 等宽标注 */
+/* 首屏细网格: 1px 发丝线 64px 方格, mask 向下渐隐, 只衬首屏不铺满 */
+.hero-grid {
+  background-image:
+    linear-gradient(to right, rgba(9, 9, 11, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(9, 9, 11, 0.05) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: linear-gradient(to bottom, black 0%, black 50%, transparent 96%);
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 50%, transparent 96%);
+}
+/* 导航链接下划线动效: 从左向右展开的品牌蓝细条 */
+.nav-link {
+  position: relative;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -7px;
+  height: 1.5px;
+  background: #09090b;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.nav-link:hover::after,
+.nav-link:focus-visible::after {
+  transform: scaleX(1);
+}
+
+/* 视觉件偏移底板: 点阵纹理 (Documenso 式深度感, 纹理而非光晕) */
+.dot-panel {
+  background-color: #fafafa;
+  border: 1px solid #e4e4e7;
+}
+.dot-texture {
+  background-image: radial-gradient(rgba(9, 9, 11, 0.13) 1px, transparent 1.4px);
+  background-size: 13px 13px;
+}
+
+/* ============ 官网 v14 (大厂平台质感: 智谱 / 火山方舟 / 硅基流动校准) ============ */
+/* 氛围底: 极淡蓝紫 wash, 拒绝死白, 无极光无光斑轮廓 (大厂都是这种"有色白") */
+.biz-atmo {
+  background-color: #f7f9fd;
+  background-image:
+    radial-gradient(52% 44% at 18% 0%, rgba(120, 150, 255, 0.14), transparent 68%),
+    radial-gradient(46% 40% at 84% 6%, rgba(168, 140, 255, 0.1), transparent 66%),
+    radial-gradient(40% 34% at 55% 30%, rgba(96, 165, 250, 0.07), transparent 70%);
+}
+/* 氛围底网格: 蓝灰细线, 上密下隐 (火山方舟式) */
+.biz-grid {
+  background-image:
+    linear-gradient(to right, rgba(80, 110, 180, 0.075) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(80, 110, 180, 0.075) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: linear-gradient(to bottom, black 0%, black 62%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 62%, transparent 100%);
+}
+/* 品牌渐变主按钮: 火山方舟"立即体验"式, 饱和蓝→深蓝, 微上光 */
+.brand-grad {
+  background: linear-gradient(135deg, #2f6bff 0%, #1f4fe0 58%, #1a3fc4 100%);
+  box-shadow: 0 1px 2px rgba(16, 44, 114, 0.24), 0 6px 16px -6px rgba(31, 79, 224, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+.brand-grad:hover {
+  background: linear-gradient(135deg, #3d78ff 0%, #2a5aea 58%, #2048d0 100%);
+}
+/* 智谱式饱和渐变英雄卡: 蓝青大渐变 + 颗粒噪点, 大厂首页第一卡的经典做法 */
+.hero-card-grad {
+  background:
+    radial-gradient(120% 90% at 8% 8%, rgba(255, 255, 255, 0.26), transparent 52%),
+    radial-gradient(130% 110% at 88% 96%, rgba(8, 40, 110, 0.5), transparent 60%),
+    linear-gradient(128deg, #3f8cff 0%, #2563eb 46%, #0ea5e9 100%);
+}
+/* 深蓝夜空底 (暗色企业版): 有层次的深蓝黑而非纯黑 */
+.biz-night {
+  background-color: #070b14;
+  background-image:
+    radial-gradient(58% 42% at 50% 0%, rgba(48, 86, 180, 0.2), transparent 70%),
+    radial-gradient(42% 34% at 88% 18%, rgba(88, 60, 190, 0.08), transparent 66%);
+}
+/* 暗色网格底纹: 蓝白细线, 极淡 */
+.night-grid {
+  background-image:
+    linear-gradient(to right, rgba(140, 165, 235, 0.065) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(140, 165, 235, 0.065) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: linear-gradient(to bottom, black 0%, black 55%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 55%, transparent 100%);
+}
+
+/* 加载动画: 竖条依次跳动点亮 (Task 42, 实时数据拉取态) */
+.loading-bar {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  height: 40px;
+}
+.loading-bar span {
+  width: 6px;
+  height: 20px;
+  background: #165dff;
+  border-radius: 3px;
+  animation: bar-jump-light 1s infinite ease-in-out;
+}
+.loading-bar span:nth-child(1) { animation-delay: 0s; }
+.loading-bar span:nth-child(2) { animation-delay: 0.15s; }
+.loading-bar span:nth-child(3) { animation-delay: 0.3s; }
+.loading-bar span:nth-child(4) { animation-delay: 0.45s; }
+.loading-bar span:nth-child(5) { animation-delay: 0.6s; }
+@keyframes bar-jump-light {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translateY(-8px);
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .loading-bar span { animation: none; opacity: 0.45; transform: none; }
+}
+
+/* Task 63: 开屏自离开保险 (纯 CSS, 不依赖 JS) — 开屏层为 SSR 静态节点, 弱网/冷启动时
+   React 水合前组件状态机无法运行, 静态开屏会挂到水合完为止 (用户实测 5-6s)。
+   该动画让开屏 0.5s 后必然自行淡出、1s 整隐藏 (露出 SSR 已渲染的页面内容)。
+   JS 正常时组件状态先行收场 (≤0.52s), animation fill 优先级高于内联样式, 互不冲突;
+   刻意不进 prefers-reduced-motion 豁免 — 隐藏开屏是功能性必要, 非装饰动画 */
+@keyframes splash-auto-leave {
+  to { opacity: 0; visibility: hidden; }
+}
+.splash-auto-leave {
+  animation: splash-auto-leave 500ms ease-out 500ms forwards;
+}
+
+
+/* ─── Task 65: CTA 点击反馈 — 水合空窗兜底 ─────────────────────────────
+ * 背景: 开屏经 CSS 兜底 ~1s 即让位, 但远程访问时 dev 未压缩 JS 的 React
+ * 水合可能尚未完成; 空窗期点击 CTA 走原生 <a> 跳转, onClick/spinner 全部
+ * 未挂载 — 用户感知「点击没有任何动画」。
+ * 方案: layout.tsx 注入解析期即执行的内联脚本, 对 [data-launch] 点击
+ * 无论水合与否都立即加 .cta-launching (按压 + 帷幕), 再按状态分流:
+ *   · 已水合: 不拦截, React 侧 spinner + 450ms 反馈链照常接管 (帷幕只是补充)
+ *   · 未水合: preventDefault + 450ms 兜底动画后原生跳转, 保证「必有动画」 */
+.cta-launching .arco-btn {
+  transform: scale(0.96);
+}
+/* 品牌白帷幕: 仅挂在不位于 backdrop-blur 头部内的 CTA (cta-veil-ok 标记)。
+ * position:fixed 要求祖先无 transform/filter — Hero/CtaBand 直挂 section 下, 安全 */
+.cta-veil-ok.cta-launching::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9998; /* 开屏 (9999) 之下 */
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.92) 0%,
+    rgba(240, 246, 255, 0.84) 55%,
+    rgba(238, 243, 255, 0.88) 100%
+  );
+  animation: cta-veil-in 260ms ease-out forwards;
+  pointer-events: none; /* 拦截由脚本 preventDefault 负责, 帷幕保持可穿透 */
+}
+@keyframes cta-veil-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* 代码窗口打标光标 (input-otp 用) */
+@keyframes caret-blink {
+  0%, 45% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+.animate-caret {
+  animation: caret-blink 1.1s step-end infinite;
+}
+
+/* ---------- 加载动画体系 ---------- */
+/* 登录/注册按钮: 三点弹跳 */
+@keyframes auth-dot-bounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
+  40% { transform: translateY(-4px); opacity: 1; }
+}
+.btn-dot {
+  animation: auth-dot-bounce 0.9s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn-dot {
+    animation: none;
+  }
+}
+
+/* 徽标文字/数字等宽 */
+.font-code {
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+}
+
+/* 文本选中色 (跟随主题色) */
+::selection {
+  background: color-mix(in srgb, var(--primary) 22%, transparent);
+}
+
+/* 登录品牌区装饰网格 */
+.auth-grid-bg {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ============ 全局消息 Toast (naive-ui n-message 原生视觉) ============
+ * 顶部居中堆叠 + 弹层三件套阴影 + 语义色实心图标 (naive 原生: 实心 glyph 直接着语义色,
+ * 无底圈/无描边/无玻璃/无入场弹性), 明暗双主题。
+ * Task 138 (用户定音): 撤销 133 的芯片图标/描边/大阴影/回弹整套美化, 回归原版观感,
+ * 仅保留 12px 圆角 = 「把原来的 Toast 变圆润一点」。动画回归 0.2s bezierEaseInOut 淡入轻落,
+ * 退场高度折叠 (fade-in-height-expand 等价)。 */
+.naive-message-container {
+  position: fixed;
+  top: 14px;
+  left: 0;
+  right: 0;
+  z-index: 6000;
+  height: 0;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+.naive-msg-wrapper {
+  transform-origin: top center;
+  overflow: visible;
+  transition:
+    opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    margin-bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.naive-message {
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  max-width: min(560px, calc(100vw - 24px));
+  padding: 9px 12px;
+  border-radius: 12px;
+  background: var(--popover);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--foreground);
+  box-shadow:
+    0 3px 6px -4px rgba(0, 0, 0, 0.12),
+    0 6px 16px 0 rgba(0, 0, 0, 0.08),
+    0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  animation: naive-msg-in 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: auto;
+}
+.dark .naive-message {
+  background: var(--popover);
+  box-shadow:
+    0 3px 6px -4px rgba(0, 0, 0, 0.24),
+    0 6px 12px 0 rgba(0, 0, 0, 0.16),
+    0 9px 18px 8px rgba(0, 0, 0, 0.1);
+}
+/* 入场: 淡入 + 轻落归位 (无回弹无缩放) */
+@keyframes naive-msg-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* 语义图标: naive 原生 = 实心 glyph 直接着语义色 */
+.naive-msg-icon {
+  height: 20px;
+  width: 20px;
+  margin-right: 8px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.naive-msg-icon svg {
+  width: 20px;
+  height: 20px;
+}
+.naive-msg-icon.success-type { color: var(--success); }
+.naive-msg-icon.info-type,
+.naive-msg-icon.message-type,
+.naive-msg-icon.loading-type { color: var(--primary); } /* isInfoFollowPrimary */
+.naive-msg-icon.warning-type { color: var(--warning); }
+.naive-msg-icon.error-type { color: var(--error); }
+.naive-msg-icon.loading-type svg {
+  animation: naive-msg-spin 1s linear infinite;
+}
+@keyframes naive-msg-spin {
+  to { transform: rotate(360deg); }
+}
+/* 关闭钮 (naive 原生常显小叉) */
+.naive-msg-close {
+  height: 16px;
+  width: 16px;
+  margin-left: 10px;
+  padding: 0;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: rgba(29, 33, 41, 0.4);
+  transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.naive-msg-close svg {
+  width: 10px;
+  height: 10px;
+}
+.naive-msg-close:hover {
+  color: rgba(29, 33, 41, 0.8);
+}
+.dark .naive-msg-close {
+  color: rgba(255, 255, 255, 0.4);
+}
+.dark .naive-msg-close:hover {
+  color: rgba(255, 255, 255, 0.85);
+}
+@media (prefers-reduced-motion: reduce) {
+  .naive-message,
+  .naive-msg-icon.loading-type svg {
+    animation: none;
+  }
+}
+/* Vue 控制台 message (naive discrete API): 无 CSS 覆盖, 原生观感 + theme.ts
+   Message.borderRadius 12px = 同款「原版 + 圆润」 (Task 138 撤 133 的 .n-message 覆盖块) */
+
+/* ---- Task 187-a: 工单「常见问题」面板 — 测量高度 morph: 显式 px 高度 + height transition (可中断续走)
+      + 内容 :key 替换式快速淡入 (替代 Task 133 的 grid-rows 0fr↔1fr + out-in 串行:
+      A→B 切换高度连续过渡、无空白拍; 高度值由内联 style 提供, 全项目仅工单中心使用)
+      Task 198: 顺滑度重调 — ①高度 0.4s easeOutQuint (前段猛/尾段爬行) → 0.32s easeOutCubic (收尾干脆);
+      ②内容入场去掉 translateY(6px): 高度滑动 + 内容上浮双运动打架是「来回切换不流畅」主因,
+      改纯 opacity 0.2s 且延迟 0.04s 让高度先行, 观感为「高度滑到位、内容柔和浮现」;
+      ③板块卡 hover 阴影从 box-shadow 过渡 (34px 大模糊逐帧重绘, 六卡来回扫呈波浪式拖沓)
+      改为 ::after 透明度淡入 (阴影层预先画好, 只过渡 opacity, 合成 cheap), 抬升 4px→2px,
+      transform/描边/底色统一 0.18s 响应更跟手, 选中底色 (inline style) 也随 background-color 平滑过渡不再跳变 ---- */
+.faq-wrap {
+  overflow: hidden;
+  transition: height 0.32s cubic-bezier(0.33, 1, 0.68, 1);
+}
+.faq-clip {
+  overflow: hidden;
+  min-height: 0;
+  transition: opacity 0.18s ease;
+}
+.faq-clip.faq-closing {
+  opacity: 0;
+}
+.faq-body {
+  animation: faq-in 0.2s ease-out 0.04s both;
+}
+@keyframes faq-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+/* 六张板块卡: 悬浮抬升 + 描边/底色渐变; 阴影走伪元素透明度 (不过渡 box-shadow 本体, 免逐帧重绘) */
+.faq-card {
+  position: relative;
+  transition:
+    transform 0.18s cubic-bezier(0.33, 1, 0.68, 1),
+    border-color 0.18s ease,
+    background-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+.faq-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 14px 34px -14px rgba(15, 23, 42, 0.18);
+  opacity: 0;
+  transition: opacity 0.18s ease;
+  pointer-events: none;
+}
+.faq-card:hover::after {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .faq-wrap,
+  .faq-clip,
+  .faq-card,
+  .faq-card::after {
+    transition: none;
+  }
+  .faq-body {
+    animation: none;
+  }
+}
+
+/* ---- Task 133: 模型商城卡片切换过渡 (transition-group 入场淡入上浮) ---- */
+.mall-card-enter-active {
+  transition: opacity 0.32s ease, transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.mall-card-enter-from {
+  opacity: 0;
+  transform: translateY(10px) scale(0.985);
+}
+@media (prefers-reduced-motion: reduce) {
+  .mall-card-enter-active {
+    transition: none;
+  }
+}
+
+/* ============ 全局交互质感 (SoybeanAdmin / Naive UI) ============ */
+/* Tailwind v4 预检把 button cursor 设为 default, 统一恢复手型 */
+button:not(:disabled),
+[role='button']:not(:disabled) {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+/* 所有按钮统一过渡: naive 官方 button transition (.3s bezierEaseInOut) —
+   NaiveUI 按钮无位移无缩放, 按压反馈仅来自颜色变深 (官方行为) */
+button {
+  transition:
+    color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* 按压态颜色 = naive 官方行为: 仅颜色变深 (--primary-pressed), 由 hover 基色 → 浅色 → 深色形成真实按压反馈 */
+/* 表格行 hover (naive tableColorHover) */
+tbody tr {
+  transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+main tbody tr:hover {
+  background-color: rgba(0, 0, 100, 0.03);
+}
+.dark main tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+/* 顶栏方形图标按钮 (naive quaternary: hover buttonColor2Hover / active pressedColor) */
+@layer components {
+  .sb-icon-btn {
+    position: relative; /* 承载点击波纹层 (.n-wave absolute inset-0) */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 34px;
+    width: 34px;
+    border-radius: var(--radius-md);
+    color: var(--muted-foreground);
+    flex-shrink: 0;
+    transition:
+      background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+      color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .sb-icon-btn:hover {
+    background-color: rgba(46, 51, 56, 0.09); /* buttonColor2Hover */
+    color: var(--primary-hover); /* 官方 textColorGhostHover = primaryColorHover */
+  }
+  .dark .sb-icon-btn:hover {
+    background-color: rgba(255, 255, 255, 0.09);
+  }
+  .sb-icon-btn:active {
+    background-color: rgba(46, 51, 56, 0.13); /* buttonColor2Pressed */
+    color: var(--primary-pressed);
+  }
+  .dark .sb-icon-btn:active {
+    background-color: rgba(255, 255, 255, 0.12);
+  }
+  .sb-icon-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 20%, transparent);
+  }
+}
+
+/* ============ n-button (naive-ui Button 精确还原, hover/pressed 为纯色变) ============
+   放入 components 层: h-11 等尺寸 utilities 可正常覆盖 (登录大按钮 44px) */
+@layer components {
+.n-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+  user-select: none;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 400;
+  height: 34px;
+  padding: 0 14px;
+  --n-wave-color: var(--primary);
+  transition:
+    background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.n-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 20%, transparent);
+}
+.n-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+/* primary: bg primary → hover 变浅 → pressed 变深 (官方 demo 实测同款按压色阶, 无任何投影) */
+.n-btn-primary {
+  background-color: var(--primary);
+  color: #fff;
+}
+.n-btn-primary:not(:disabled):hover {
+  background-color: var(--primary-hover);
+}
+.n-btn-primary:not(:disabled):active {
+  background-color: var(--primary-pressed);
+}
+/* default: 透明底 + 边框, hover/active 文字与边框一起变色 */
+.n-btn-default {
+  background-color: transparent;
+  color: var(--secondary-foreground);
+  border: 1px solid var(--border);
+}
+.n-btn-default:not(:disabled):hover {
+  color: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+.n-btn-default:not(:disabled):active {
+  color: var(--primary-pressed);
+  border-color: var(--primary-pressed);
+}
+/* secondary: buttonColor2 rgba(46,51,56,.05/.09/.13) */
+.n-btn-secondary {
+  background-color: rgba(46, 51, 56, 0.05);
+  color: var(--secondary-foreground);
+}
+.n-btn-secondary:not(:disabled):hover {
+  background-color: rgba(46, 51, 56, 0.09);
+}
+.n-btn-secondary:not(:disabled):active {
+  background-color: rgba(46, 51, 56, 0.13);
+}
+.dark .n-btn-secondary {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+.dark .n-btn-secondary:not(:disabled):hover {
+  background-color: rgba(255, 255, 255, 0.09);
+}
+.dark .n-btn-secondary:not(:disabled):active {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+/* quaternary (ghost): 透明 → buttonColor2Hover → pressed */
+.n-btn-quaternary {
+  background-color: transparent;
+  color: var(--secondary-foreground);
+}
+.n-btn-quaternary:not(:disabled):hover {
+  background-color: rgba(46, 51, 56, 0.09);
+}
+.n-btn-quaternary:not(:disabled):active {
+  background-color: rgba(46, 51, 56, 0.13);
+}
+.dark .n-btn-quaternary:not(:disabled):hover {
+  background-color: rgba(255, 255, 255, 0.09);
+}
+.dark .n-btn-quaternary:not(:disabled):active {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+/* error */
+.n-btn-error {
+  background-color: var(--error);
+  color: #fff;
+  --n-wave-color: var(--error);
+}
+.n-btn-error:not(:disabled):hover {
+  background-color: var(--error-hover);
+}
+.n-btn-error:not(:disabled):active {
+  background-color: var(--error-pressed);
+}
+/* soft: primary 底半透明 (secondary 透明度体系 0.16/0.22/0.28, color-mix 跟随主题色) */
+.n-btn-soft {
+  background-color: color-mix(in srgb, var(--primary) 16%, transparent);
+  color: var(--primary);
+}
+.n-btn-soft:not(:disabled):hover {
+  background-color: color-mix(in srgb, var(--primary) 22%, transparent);
+}
+.n-btn-soft:not(:disabled):active {
+  background-color: color-mix(in srgb, var(--primary) 28%, transparent);
+}
+/* 尺寸: naive heightSmall 28 / heightMedium 34 / heightLarge 40 */
+.n-btn-sm {
+  height: 28px;
+  padding: 0 10px;
+  font-size: 13px;
+}
+.n-btn-lg {
+  height: 40px;
+  padding: 0 18px;
+  font-size: 15px;
+}
+}
+
+/* n-button 点击波纹 (naive 官方 button-wave 圆环扩散 + 淡出; 本站加强至 7px 让点击反馈更可感知,
+   waveOpacity 0.6 / 0.55s / bezierEaseOut) */
+@keyframes n-wave-spread {
+  from { box-shadow: 0 0 0.5px 0 var(--n-wave-color); }
+  to { box-shadow: 0 0 0.5px 7px var(--n-wave-color); }
+}
+@keyframes n-wave-opacity {
+  from { opacity: 0.6; }
+  to { opacity: 0; }
+}
+.n-wave {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  animation:
+    n-wave-spread 0.55s cubic-bezier(0, 0, 0.2, 1),
+    n-wave-opacity 0.55s cubic-bezier(0, 0, 0.2, 1) forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .n-wave { animation: none; }
+  .sb-popover-in { animation: none; }
+}
+
+/* NCheckbox 勾选框点击波纹 (n-wave 同源: primary 方形波纹, 16px 方框收紧版) */
+.auth-checkbox .n-wave {
+  --n-wave-color: var(--primary);
+  animation:
+    n-wave-spread-sm 0.5s cubic-bezier(0, 0, 0.2, 1),
+    n-wave-opacity-sm 0.5s cubic-bezier(0, 0, 0.2, 1) forwards;
+}
+@keyframes n-wave-spread-sm {
+  from { box-shadow: 0 0 0.5px 0 var(--n-wave-color); }
+  to { box-shadow: 0 0 0.5px 4.5px var(--n-wave-color); }
+}
+@keyframes n-wave-opacity-sm {
+  from { opacity: 0.6; }
+  to { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-checkbox .n-wave { animation: none; }
+}
+
+/* NCheckbox 方框状态色 (naive checkbox light 官方值; unlayered 规则压过 utility 冲突) */
+.auth-checkbox-box {
+  border-color: var(--border);
+}
+.auth-checkbox-box--checked {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+.auth-checkbox:hover .auth-checkbox-box {
+  border-color: var(--primary); /* 官方 hover → borderChecked (primary 实色) */
+}
+.auth-checkbox:focus-visible .auth-checkbox-box {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 30%, transparent); /* 官方 boxShadowFocus */
+}
+
+/* ============ SoybeanAdmin 原版登录页 (v2.2.0 复刻) ============ */
+/* 页面底色: 官方 mixColor(#ffffff, themeColor #2080f0, 0.2) = #d2e6fc;
+   暗色取官方 darkThemeMixColor #141414 与主色 30% 混合 = #183456 */
+.auth-page {
+  background-color: #d2e6fc;
+}
+.dark .auth-page {
+  background-color: #183456;
+}
+/* 锐利直角卡片 (官方结构 + 方角化): 白卡 + 轻阴影 + 发丝描边, 暗色用 container rgb(28,28,28)
+   padding 取官方 NCard 内容边距 19px 24px 20px, 移动端左右稍收窄 */
+.auth-card {
+  padding: 19px 24px 20px;
+  border-radius: 2px;
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  box-shadow: 0 8px 28px rgba(0, 21, 41, 0.08);
+}
+@media (max-width: 640px) {
+  .auth-card {
+    padding: 18px 20px 18px;
+  }
+}
+.dark .auth-card {
+  background: rgb(28, 28, 28);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.38);
+}
+/* 卡片内图标按钮同步方角化 */
+.auth-card .sb-icon-btn {
+  border-radius: 3px;
+}
+/* 波浪在暗色下降低不透明度, 变为柔光 */
+.dark .auth-waves svg {
+  opacity: 0.18;
+}
+/* 卡片与表单入场 (官方 fade-slide 过渡) */
+.auth-card-in {
+  animation: auth-card-in 0.45s cubic-bezier(0.4, 0, 0.24, 1) both;
+}
+.auth-slide-in {
+  animation: auth-slide-in 0.4s cubic-bezier(0.4, 0, 0.24, 1) both;
+}
+@keyframes auth-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes auth-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-card-in,
+  .auth-slide-in {
+    animation: none;
+  }
+}
+
+/* ============ 后台交互 (NaiveUI 原生: 无缩放/无浮起/无弹簧 — Task 98 完全对齐模板) ============ */
+
+/* 标签栏 (Soybean Admin chrome 模式, 方角化): 白底 + 底部发丝线;
+   激活页签 = 内容底色块 + 1px 下沿覆盖栏底线, 与内容区连体, 文字/图标 primary */
+.sb-tabs-bar {
+  background: var(--card);
+  border-bottom: 1px solid var(--divider);
+}
+/* ── Task 47: Arco Design 官网 ───────────────────────────── */
+
+/* 防意外横向溢出 (代码窗/表格均已容器内滚动, clip 不产生滚动容器, 不影响 sticky) */
+body {
+  overflow-x: clip;
+}
+
+/* 顶部横向菜单: 透明融入导航条, 去默认下边框 */
+
+/* 锚点定位: 预留 sticky 导航高度 */
+.arco-landing-section {
+  scroll-margin-top: 76px;
+}
+
+/* 模型广场表格: 表头浅灰、行悬浮一致 */
+.landing-table-card .arco-table-th {
+  background: #f7f8fa;
+  color: #4e5969;
+  font-weight: 500;
+}
+
+/* Task 168 (已废弃): 手写 media 方案两连败 — ① min-width:900px 打在 <table> 上被后加载 chunk 的
+   arco `.arco-table table{min-width:100%}` 同特异性反杀; ② 升特异性后 computed 生效但仍撑不开
+   arco 用 div 模拟的滚动层 (.arco-table-content-inner), scrollWidth 不变。
+   最终改用 arco 原生 scroll={{x:900}} (enterprise-sections.tsx), 由库自己设滚动层 min-width。 */
+
+/* ── Task 184-c: FAQ 手风琴自实现 (替代 Arco Collapse) ─────────────────
+   范式沿用 Task 133 已验证的 grid-template-rows 0fr↔1fr: 纯 CSS 过渡,
+   中途再次点击时从当前插值续走 (可中断), 来回快切无跳变;
+   视觉延续原覆盖样式: 白底卡片、细边框 #e5e6eb、圆角 8px。
+   不加 will-change: grid-rows 属布局动画无法合成器提升, 6 个静态条目无需预分层。 */
+.landing-faq-item {
+  border: 1px solid #e5e6eb;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  background: #fff;
+  overflow: hidden; /* 圆角裁剪 + 展开内容兜底裁剪 */
+}
+/* 头部: button 语义 (可聚焦/aria-expanded), hover 浅灰反馈 */
+.landing-faq-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  padding: 8px 30px 8px 16px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 24px;
+  color: #1d2129;
+  transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@media (hover: hover) {
+  .landing-faq-head:hover {
+    background: #f7f8fa;
+  }
+}
+.landing-faq-head:focus-visible {
+  outline: 2px solid rgba(22, 93, 255, 0.45);
+  outline-offset: -2px;
+}
+.landing-faq-q {
+  flex: 1;
+}
+/* 右侧箭头: 收起 ▶ → 展开 ▼, 与内容区同速同缓动, 展开态点缀品牌蓝 */
+.landing-faq-arrow {
+  flex-shrink: 0;
+  color: #86909c;
+  transform: rotate(0deg);
+  transition:
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.landing-faq-item-open .landing-faq-arrow {
+  transform: rotate(90deg);
+  color: #165dff;
+}
+/* 展开/收起高度: 0fr↔1fr, 300ms 统一缓动 */
+.landing-faq-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.landing-faq-item-open .landing-faq-wrap {
+  grid-template-rows: 1fr;
+}
+.landing-faq-clip {
+  overflow: hidden;
+  min-height: 0;
+}
+/* 内容交叉淡入: 展开稍延迟让高度先腾出空间, 收起快速淡出避免文字被裁切感 */
+.landing-faq-body {
+  padding: 2px 16px 16px;
+  opacity: 0;
+  transition: opacity 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.landing-faq-item-open .landing-faq-body {
+  opacity: 1;
+  transition: opacity 0.26s cubic-bezier(0.4, 0, 0.2, 1) 0.05s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing-faq-wrap,
+  .landing-faq-arrow,
+  .landing-faq-body,
+  .landing-faq-head {
+    transition: none;
+  }
+}
+
+/* ── Task 48: 官网配图高级化 ───────────────────────────── */
+
+/* 能力/计费卡: 悬浮上移 + 柔和投影 + 品牌色描边 */
+.landing-card {
+  transition:
+    transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1),
+    box-shadow 0.3s cubic-bezier(0.22, 0.61, 0.36, 1),
+    border-color 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.landing-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(22, 93, 255, 0.35);
+  box-shadow: 0 24px 48px -22px rgba(22, 93, 255, 0.28);
+}
+
+/* CTA 深色底上的按钮: 白色实心 / 白色描边 */
+.landing-cta-white.arco-btn.arco-btn-secondary {
+  background: #fff;
+  color: #165dff;
+  border: 1px solid #fff;
+}
+.landing-cta-white.arco-btn.arco-btn-secondary:hover, .landing-cta-white.arco-btn.arco-btn-secondary:focus-visible {
+  background: #f2f7ff;
+  border-color: #f2f7ff;
+  color: #0e42d2;
+}
+.landing-cta-ghost.arco-btn.arco-btn-secondary {
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+}
+.landing-cta-ghost.arco-btn.arco-btn-secondary:hover, .landing-cta-ghost.arco-btn.arco-btn-secondary:focus-visible {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.85);
+  color: #fff;
+}
+
+/* ── Task 53: 控制台质感层 (后台美化 + 按钮交互连贯性/灵动性) ───────────── */
+
+/* 统一焦点环: 裸 button/select 键盘聚焦时品牌色 ring (与 n-btn / sb-icon-btn 同一视觉语言) */
+button:focus-visible,
+[role='button']:focus-visible,
+select:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 22%, transparent);
+}
+
+/* 侧边栏菜单项: 承载点击波纹 (NaiveWave 选择器命中 button.sb-menu-item) */
+button.sb-menu-item {
+  --n-wave-color: var(--primary);
+}
+
+/* 品牌 mini 加载条 (控制台数据加载态: 与全站启动屏同源的 5 竖条) */
+.loading-bar--sm {
+  height: 26px;
+  gap: 5px;
+}
+.loading-bar--sm span {
+  width: 4px;
+  height: 13px;
+  border-radius: 2px;
+}
+
+/* Task 66: 表格行 hover 反馈 (NaiveUI n-data-table 行语言, 此前行无任何 hover 表现) */
+.naive-scrollbar tbody tr {
+  transition: background-color 0.18s ease;
+}
+.naive-scrollbar tbody tr:hover {
+  background-color: rgb(250 250 252);
+}
+.dark .naive-scrollbar tbody tr:hover {
+  background-color: rgb(255 255 255 / 0.04);
+}
+
+/* 开关: 颜色过渡 (NaiveUI 原生无缩放) */
+button[role='switch'] {
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 看板欢迎横幅已素化 (Task 98): 朴素白卡, .sb-hero 家族样式已删 */
+
+/* ── Task 54: 视觉丰富化层 (去单调: 多彩渐变 + 动效 + 深浅对比) ───────────── */
+
+/* ============ A. 官网 ============ */
+
+/* ① Hero 极光底: 蓝→青→紫三色柔光团 (企业级克制剂量, 打破纯白单调) */
+.ld-aurora {
+  background:
+    radial-gradient(760px 420px at 8% -10%, rgba(114, 46, 209, 0.07), transparent 60%),
+    radial-gradient(900px 460px at 88% -18%, rgba(22, 93, 255, 0.1), transparent 62%),
+    radial-gradient(680px 420px at 66% 120%, rgba(20, 201, 201, 0.08), transparent 60%);
+}
+
+/* ② 网格纹理: 自上而下渐隐, 衬托底色不抢内容 */
+.ld-grid-tex {
+  background-image:
+    linear-gradient(rgba(29, 33, 41, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(29, 33, 41, 0.05) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(to bottom, black, transparent 68%);
+  -webkit-mask-image: linear-gradient(to bottom, black, transparent 68%);
+}
+
+/* ③ 标题渐变文字 (品牌蓝→青) */
+.ld-grad-text {
+  background: linear-gradient(92deg, #165dff 8%, #14c9c9 96%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* ④ Hero 配图卡背后三色光晕 */
+.ld-hero-glow {
+  background:
+    radial-gradient(46% 46% at 30% 24%, rgba(22, 93, 255, 0.16), transparent 70%),
+    radial-gradient(42% 42% at 78% 64%, rgba(20, 201, 201, 0.15), transparent 70%),
+    radial-gradient(36% 36% at 20% 86%, rgba(114, 46, 209, 0.1), transparent 70%);
+}
+
+/* ⑤ 模型名跑马灯: 匀速左移 46s, hover 暂停; 内容双份拼接实现无缝循环 */
+.ld-ticker {
+  mask-image: linear-gradient(90deg, transparent, black 7%, black 93%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 7%, black 93%, transparent);
+}
+.ld-ticker-track {
+  display: flex;
+  width: max-content;
+  animation: ld-marquee 46s linear infinite;
+}
+.ld-ticker:hover .ld-ticker-track {
+  animation-play-state: paused;
+}
+@keyframes ld-marquee {
+  to { transform: translateX(-50%); }
+}
+
+/* ⑥ 能力卡专属配色: CSS 变量驱动 (顶彩条 / 描边 / 投影全部跟随卡片主题色) */
+.ld-feat {
+  position: relative;
+  overflow: hidden;
+}
+.ld-feat::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--ld-c1), var(--ld-c2));
+  opacity: 0;
+  transform: scaleX(0.25);
+  transform-origin: left;
+  transition: opacity 0.3s ease, transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.ld-feat:hover::before {
+  opacity: 1;
+  transform: scaleX(1);
+}
+.ld-feat:hover {
+  border-color: color-mix(in srgb, var(--ld-c1) 42%, transparent);
+  box-shadow: 0 24px 48px -22px color-mix(in srgb, var(--ld-c1) 32%, transparent);
+}
+.ld-tile {
+  background: linear-gradient(135deg, var(--ld-c1) 0%, var(--ld-c2) 100%);
+  box-shadow: 0 10px 22px -10px color-mix(in srgb, var(--ld-c2) 65%, transparent);
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.ld-feat:hover .ld-tile,
+.ld-feat:hover .sb-tile-grad {
+  transform: scale(1.06) rotate(-4deg);
+}
+
+/* ⑦ 卡片顶部品牌渐变发丝线 (模型广场表格卡) */
+.ld-card-hairline {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2.5px;
+  border-radius: 12px 12px 0 0;
+  background: linear-gradient(90deg, #4080ff, #14c9c9 55%, #a871e3);
+  pointer-events: none;
+}
+
+/* ⑦b 模型广场「实时」呼吸点 (Task 161: 每 5s 轮询真实 60s 窗口的状态指示) */
+.ld-live-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: #00b42a;
+  box-shadow: 0 0 0 0 rgba(0, 180, 42, 0.45);
+  animation: ld-live-pulse 2.2s ease-in-out infinite;
+}
+@keyframes ld-live-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(0, 180, 42, 0.45);
+  }
+  50% {
+    opacity: 0.55;
+    box-shadow: 0 0 0 4px rgba(0, 180, 42, 0);
+  }
+}
+
+/* ⑧ CTA 扫光: 斜向高光带周期性掠过 */
+.ld-cta-shine::after {
+  content: '';
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: -34%;
+  width: 32%;
+  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.09), transparent);
+  transform: skewX(-18deg);
+  animation: ld-sweep 7.5s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes ld-sweep {
+  0%, 55% { left: -34%; }
+  88%, 100% { left: 118%; }
+}
+
+/* ⑨ 深色页脚: 深海军蓝渐变 + 顶部品牌发丝线 + 双色光晕 (页尾深浅对比收尾) */
+.ld-footer {
+  background:
+    radial-gradient(560px 300px at 88% -20%, rgba(22, 93, 255, 0.16), transparent 62%),
+    radial-gradient(460px 260px at 6% 122%, rgba(20, 201, 201, 0.1), transparent 60%),
+    linear-gradient(180deg, #10142a 0%, #0b0e1f 100%);
+}
+.ld-footer-hairline {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(74, 163, 253, 0.55), rgba(20, 201, 201, 0.55), transparent);
+}
+
+/* ⑩ 模型广场表头: 浅蓝渐变 */
+.landing-table-card .arco-table-th {
+  background: linear-gradient(180deg, #f2f6ff, #f7f8fa);
+}
+
+/* ⑫ Arco 主按钮品牌渐变化 (官网全站主按钮统一质感) + 悬浮浮起 */
+.arco-btn-primary {
+  background-image: linear-gradient(135deg, #4080ff 0%, #165dff 58%, #0e42d2 100%);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, filter 0.3s ease;
+}
+.arco-btn-primary:not(.arco-btn-disabled):not(.arco-btn-loading):hover,
+.arco-btn-primary:not(.arco-btn-disabled):not(.arco-btn-loading):focus-visible {
+  background-image: linear-gradient(135deg, #4a89ff 0%, #2a6dff 58%, #165dff 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px -8px rgba(22, 93, 255, 0.6);
+}
+.arco-btn-primary:not(.arco-btn-disabled):not(.arco-btn-loading):active {
+  transform: translateY(0) scale(0.97);
+  box-shadow: 0 3px 8px -4px rgba(22, 93, 255, 0.5);
+}
+
+/* ============ B. 控制台 ============ */
+
+/** ② 统计卡渐变芯片已删除 (Task 98 素化: .stat-chip 统一品牌淡底) */
+
+/* ③ 统计卡顶部彩条: 常态低透明, 悬浮点亮 (与卡片主题色联动) */
+/* 统计卡顶条已删除 (Task 98 素化) */
+
+/* ⑤ 侧边栏底部信息卡: 已删除 (Task 98 素化 — Soybean 侧边栏底部无品牌卡) */
+/* Task 54 无障碍: 偏好减少动效时静态化 */
+@media (prefers-reduced-motion: reduce) {
+  .ld-ticker-track {
+    animation: none;
+  }
+  .ld-cta-shine::after {
+    animation: none;
+    display: none;
+  }
+  .ld-feat::before {
+    transition: none;
+  }
+  .arco-btn-primary,
+  .arco-btn-primary:not(.arco-btn-disabled):not(.arco-btn-loading):hover,
+  .arco-btn-primary:not(.arco-btn-disabled):not(.arco-btn-loading):active {
+    transform: none;
+  }
+}
+
+/* ── Task 55: Hero 统计带 + 路由段读数卡重设计 (替换裸 Statistic 文字块) ───── */
+
+/* Hero 统计带: 玻璃卡 + 等宽三列 + 渐隐分隔线 (排列彻底对齐) */
+.ld-statband {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-radius: 16px;
+  border: 1px solid rgba(229, 230, 235, 0.9);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.72));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow:
+    0 28px 56px -36px rgba(29, 33, 41, 0.35),
+    0 1px 0 0 rgba(255, 255, 255, 0.8) inset;
+}
+.ld-statcell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 18px 20px;
+  transition: background-color 0.25s ease;
+}
+.ld-statcell:hover {
+  background-color: rgba(242, 246, 255, 0.6);
+}
+/* 格间分隔线: 上下渐隐, 比实线更轻盈 */
+.ld-statcell + .ld-statcell::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 20%;
+  height: 60%;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, #e5e6eb 30%, #e5e6eb 70%, transparent);
+}
+/* 渐变图标芯片 (Hero 与路由段读数卡共用) */
+.ld-stat-ico {
+  flex: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 19px;
+  background: linear-gradient(135deg, var(--c1), var(--c2));
+  box-shadow: 0 10px 22px -10px var(--c1);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.ld-statcell:hover .ld-stat-ico {
+  transform: translateY(-2px) scale(1.07);
+}
+.ld-stat-ico--sm {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  font-size: 17px;
+}
+.ld-stat-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+/* 渐变数字 (120° 浅→深), tabular-nums 防跳动 */
+.ld-num-grad {
+  background: linear-gradient(120deg, var(--c1), var(--c2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.ld-stat-num {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.12;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.ld-stat-label {
+  font-style: normal;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: #86909c;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* 移动端: 三列挤不下, 改纵向堆叠 (分隔线转横向渐隐) */
+@media (max-width: 639.98px) {
+  .ld-statband {
+    grid-template-columns: 1fr;
+  }
+  .ld-statcell {
+    padding: 13px 18px;
+  }
+  .ld-statcell + .ld-statcell::before {
+    left: 18px;
+    right: 18px;
+    top: 0;
+    height: 1px;
+    width: auto;
+    background: linear-gradient(90deg, transparent, #e5e6eb 25%, #e5e6eb 75%, transparent);
+  }
+  .ld-stat-num {
+    font-size: 22px;
+  }
+  .ld-stat-ico {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    font-size: 17px;
+  }
+}
+
+/* 路由段读数卡: 彩色发丝线 + 渐变数字 + 图标芯片, hover 同色浮起 */
+.ld-netcard {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  border: 1px solid #e5e6eb;
+  background: #fff;
+  padding: 20px 22px;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+}
+.ld-netcard::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--c1), var(--c2));
+  opacity: 0.55;
+  transition: opacity 0.3s ease;
+}
+.ld-netcard:hover {
+  transform: translateY(-3px);
+  border-color: rgba(229, 230, 235, 0.6);
+  box-shadow: 0 24px 48px -24px var(--glow);
+}
+.ld-netcard:hover::before {
+  opacity: 1;
+}
+.ld-netcard-num {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ld-statcell,
+  .ld-stat-ico,
+  .ld-netcard,
+  .ld-netcard::before {
+    transition: none;
+  }
+  .ld-netcard:hover {
+    transform: none;
+  }
+}
+
+/* ─── Task 67: 日志页 (历史浏览) 重写配套 + 全站点击流畅化 ───────────── */
+
+/* --- 减少动效偏好: 交互全部静态化 --- */
+@media (prefers-reduced-motion: reduce) {
+  .n-btn,
+  .sb-icon-btn,
+  .sb-select-trigger,
+  .sb-seg-item {
+    transition: none;
+  }
+}
+
+
+/* ── 官网移动端抽屉 (Task 82 去 Arco 重写, 原 Drawer 动画等价) ── */
+.ld-drawer-mask {
+  animation: ld-fade-in 0.22s ease both;
+}
+.ld-drawer-panel {
+  animation: ld-slide-right 0.26s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+@keyframes ld-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes ld-slide-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ld-drawer-mask,
+  .ld-drawer-panel {
+    animation: none;
+  }
+}

@@ -1,0 +1,63 @@
+北辰中转站 AI 网关 — 源码部署说明 (2026-10-21 版)
+====================================================
+
+一、环境要求
+- Node.js 20+（推荐 20 LTS）
+- npm 10+（锁文件用 package-lock.json；如装了 bun 亦可）
+- 数据库默认 SQLite，无需额外安装服务
+
+二、目录结构速览
+- src/       应用源码（Next.js App Router 官网/控制台 + /v1 中继引擎 + vue-console 后台）
+- prisma/    数据库 schema.prisma 与种子脚本 seed.ts
+- public/    静态资源
+- 根目录     next/ts/tailwind/eslint 等配置
+
+三、安装与初始化
+1) npm install
+2) 在根目录创建 .env，最小配置：
+      DATABASE_URL="file:./db/custom.db"
+      SESSION_SECRET="请换成你自己的随机长字符串"
+   注意：
+   - SQLite 相对路径按 prisma/schema.prisma 所在目录解析；
+     想放到项目根的 db/ 下，可写绝对路径，如 file:/home/you/app/db/custom.db
+   - SESSION_SECRET 是管理后台登录态的签名密钥，源码中的回退值仅为开发默认，
+     生产环境务必设置独立强随机值，不要复用回退值！
+3) 初始化数据库：
+      npx prisma db push
+      npx prisma generate
+4) 写入种子数据（默认管理员 + 系统设置 + 常用模型定价）：
+      npx tsx prisma/seed.ts
+
+四、构建与启动
+- 开发：npm run dev            （http://localhost:3000）
+- 生产：npm run build && npm start
+  说明：start 脚本用 bun 运行 standalone 产物；
+  没装 bun 的话可改用：NODE_ENV=production node .next/standalone/server.js
+
+五、默认管理员
+- 用户名 root，初始密码 123456（见 prisma/seed.ts，属项目默认值）
+- 首次登录后请立刻在控制台修改密码！
+
+六、常用配置
+- DATABASE_URL：数据库连接，本地跑通用上面的最小配置即可
+- SESSION_SECRET：登录态签名密钥（见三-2，生产必设）
+- 邮箱 SMTP / 邮箱验证注册、Turnstile 人机校验、计费与分组倍率等，
+  全部在控制台「系统设置」里配置（存数据库），不用写 .env
+- 上游渠道（OpenAI 兼容地址 + 密钥）在控制台「渠道」页添加，密钥存库不落码
+
+七、内置自动化能力（无需额外配置，控制台可调）
+- 模型指标自探测：每轮对已上架模型经真实中继链路发流式探测，
+  驱动模型广场的 状态/延迟/吞吐 徽章（Option: ProbeEnabled/ProbeIntervalSec/ProbeExclude）
+- 模型健康自动上下架：连续探测异常/首字超阈值的模型自动从广场与 /v1/models 隐藏，
+  恢复后自动回榜（Option: HealthEnabled/HealthFailRounds/HealthRecoverRounds/HealthTtftMs）
+- 渠道级熔断与半开恢复、上游密钥轮转与会话粘性等均为内置逻辑，见 src/lib/
+
+八、备注
+- 源码中少量页面/接口把站点域名作为默认回退值（形如 bz.013.ltd / www.013.ltd），
+  自用时可在控制台设置 ServerAddress，或在 src/ 内检索替换成自己的域名。
+- prisma/seed.ts 原位于 scripts/ 目录，打包时移到 prisma/ 便于交付；
+  package.json 未注册 seed 命令，按上面第 3) 步手动执行即可。
+- 本包不含任何 .env、数据库文件、密钥文件与运维脚本；上游渠道密钥与
+  SMTP 等运行时配置全部存于数据库（首次用种子初始化后在控制台配置）。
+
+（完）

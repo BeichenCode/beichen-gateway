@@ -1,0 +1,39 @@
+/**
+ * Task 104 — 明暗切换 View Transitions 圆形揭示样式
+ * setThemeModeWithReveal() 在 <html data-vt-reveal> 期间触发 startViewTransition:
+ * 旧快照静止在下层, 新快照以触发点为圆心 clip-path 圆形扩张揭示 (全元素单次合成动画)。
+ * 仅命中 data-vt-reveal 会话 — 系统模式自动翻转等被动切换保持瞬时, 不产生意外动画。
+ */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 2147483646;
+}
+
+html[data-vt-reveal]::view-transition-new(root) {
+  animation: vt-circle-reveal 0.45s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+@keyframes vt-circle-reveal {
+  from {
+    clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 50%));
+  }
+  to {
+    clip-path: circle(var(--vt-r, 150%) at var(--vt-x, 50%) var(--vt-y, 50%));
+  }
+}
+
+/* 揭示期间抑制页面内 300ms transition 与快照叠加产生的二阶抖动 (Task 104 流畅化) */
+html[data-vt-reveal] *,
+html[data-vt-reveal] *::before,
+html[data-vt-reveal] *::after {
+  transition: none !important;
+}

@@ -1,0 +1,62 @@
+/* Task 123: 卡片指针丝滑交互 — 3D 微倾斜 + 指针光斑 (Linear / Stripe 风格)
+ * 引擎见 tilt.ts (document 级 mousemove 委托, rAF 直写 CSS 变量)。
+ * 跟手态: transform 90ms linear — 消除鼠标抖动且零迟滞;
+ * 离卡态: 550ms cubic-bezier 弹性回正, 光斑淡出。
+ * 移动端无 mousemove 天然禁用; 仅影响 [data-tilt] 标记的卡片。 */
+
+[data-tilt] {
+  --t-rx: 0deg;
+  --t-ry: 0deg;
+  --t-mx: 50%;
+  --t-my: 50%;
+  /* 每卡通过 style 传入: --t-glow (悬停阴影色) / --t-spot (光斑色) */
+  position: relative;
+  transform: perspective(900px) rotateX(var(--t-rx)) rotateY(var(--t-ry)) translateY(var(--t-lift, 0px));
+  transition:
+    transform 550ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 550ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-tilt].is-tilting {
+  --t-lift: -3px;
+  z-index: 1;
+  /* 跟手: 极短线性过渡, 连续 mousemove 下平滑跟随且无「钝」感 */
+  transition:
+    transform 90ms linear,
+    box-shadow 400ms cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 18px 44px -18px var(--t-glow, rgba(15, 23, 42, 0.22));
+}
+
+/* 指针光斑: radial-gradient 跟随 --t-mx/--t-my, 玻璃高光叠在内容之上 */
+[data-tilt]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  background: radial-gradient(
+    460px circle at var(--t-mx) var(--t-my),
+    var(--t-spot, rgba(32, 128, 240, 0.1)),
+    transparent 62%
+  );
+  opacity: 0;
+  transition: opacity 420ms ease;
+  pointer-events: none;
+}
+
+[data-tilt].is-tilting::after {
+  opacity: 1;
+  transition: opacity 180ms ease;
+}
+
+/* 系统减少动态效果偏好: 回退为纯阴影, 不倾斜不位移 */
+@media (prefers-reduced-motion: reduce) {
+  [data-tilt],
+  [data-tilt].is-tilting {
+    transform: none;
+    transition: box-shadow 300ms ease;
+  }
+  [data-tilt].is-tilting {
+    --t-lift: 0px;
+  }
+}

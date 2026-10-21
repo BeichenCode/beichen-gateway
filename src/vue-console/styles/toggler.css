@@ -1,0 +1,30 @@
+/**
+ * MenuToggler 无痕形态 (Task 108 定稿, 111 轮从生产产物逐字节恢复)
+ *   Task 107 曾做芯片盒 (描边+底色), 用户否决「难看死了，不要显示白框」→ 整体撤除;
+ *   素态只见图标, hover 主色渐染 + 轻放大, active 按压回弹, focus-visible 环保留;
+ *   颜色走 theme.ts 注入的 RGB 分量变量 (--primary-500-color / --base-text-bg-color),
+ *   主题抽屉换色与暗色模式自动联动。
+ */
+.menu-toggler-btn {
+  color: rgb(var(--base-text-bg-color) / 0.8);
+  cursor: pointer;
+  background: 0 0;
+  border: none;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  transition: color 0.25s, transform 0.15s;
+  display: inline-flex;
+}
+.menu-toggler-btn:hover {
+  color: rgb(var(--primary-500-color));
+  transform: scale(1.05);
+}
+.menu-toggler-btn:active {
+  transform: scale(0.9);
+}
+.menu-toggler-btn:focus-visible {
+  outline: 2px solid rgb(var(--primary-500-color) / 0.4);
+  outline-offset: 2px;
+}

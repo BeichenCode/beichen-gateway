@@ -1,0 +1,444 @@
+/* ============================================================
+   Tab Lab — 页签条方案对比实验室 (Task 73)
+   7 套可交互方案, 全部避开已否决路线 (chrome 弧角 / 镜面高光 / 饱和渐变)
+   仅本页生效: 类名前缀 tl-* / tv1~tv7
+   ============================================================ */
+
+/* ---------- 主题令牌 (明/暗) ---------- */
+.tl-scope {
+  --tl-mut: #5c6470;
+  --tl-ink: #1d2430;
+  --tl-hover: rgba(31, 35, 41, 0.055);
+  --tl-tint: rgba(22, 93, 255, 0.08);
+  --tl-tint-hover: rgba(22, 93, 255, 0.12);
+  --tl-tint-bd: rgba(22, 93, 255, 0.18);
+  --tl-track: #edeff3;
+  --tl-track3: #f0f2f5;
+  --tl-seg-track: #e9ecf1;
+  --tl-float-shadow: 0 1px 2px rgba(16, 24, 40, 0.09), 0 0 0 1px rgba(16, 24, 40, 0.035);
+  --tl-chrome-bg: #f7f8fa;
+}
+.dark .tl-scope {
+  --tl-mut: rgba(255, 255, 255, 0.58);
+  --tl-ink: #e8ecf3;
+  --tl-hover: rgba(255, 255, 255, 0.08);
+  --tl-tint: rgba(22, 93, 255, 0.16);
+  --tl-tint-hover: rgba(22, 93, 255, 0.22);
+  --tl-tint-bd: rgba(22, 93, 255, 0.3);
+  --tl-track: rgba(255, 255, 255, 0.05);
+  --tl-track3: rgba(255, 255, 255, 0.045);
+  --tl-seg-track: rgba(255, 255, 255, 0.07);
+  --tl-float-shadow: 0 1px 2px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.07);
+  --tl-chrome-bg: rgba(255, 255, 255, 0.03);
+}
+
+/* ---------- 方案卡 / 演示窗 ---------- */
+.tl-card {
+  border-radius: 16px;
+  border: 1px solid var(--divider);
+  background: var(--card);
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.05);
+}
+.tl-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 22px;
+  min-width: 30px;
+  padding: 0 7px;
+  border-radius: 7px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.tl-from {
+  font-size: 11px;
+  color: var(--tl-mut);
+  border: 1px solid var(--divider);
+  border-radius: 999px;
+  padding: 2px 9px;
+  white-space: nowrap;
+}
+.tl-window {
+  border-radius: 12px;
+  border: 1px solid var(--divider);
+  overflow: hidden;
+  background: var(--card);
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06);
+}
+.tl-chrome {
+  height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--divider);
+  background: var(--tl-chrome-bg);
+}
+.tl-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  opacity: 0.92;
+}
+.tl-chrome-title {
+  margin-left: 8px;
+  font-size: 12px;
+  color: var(--tl-mut);
+}
+.tl-content {
+  height: 104px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--background, var(--card));
+}
+.tl-content-cap {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--tl-mut);
+}
+.tl-content-label {
+  font-size: 19px;
+  font-weight: 650;
+  color: var(--tl-ink);
+}
+
+/* ---------- 页签条公共底座 ---------- */
+.tl-bar {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  height: 44px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tl-bar::-webkit-scrollbar {
+  display: none;
+}
+.tl-tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--tl-mut);
+  animation: tl-in 0.3s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  transition: background-color 0.18s ease, color 0.18s ease, transform 0.09s ease, box-shadow 0.18s ease;
+}
+.tl-tab:active {
+  transform: scale(0.965);
+}
+@keyframes tl-in {
+  from {
+    opacity: 0;
+    transform: translateY(7px) scale(0.92);
+  }
+}
+.tl-icon-on {
+  color: var(--primary);
+}
+.tl-x {
+  margin-left: 4px;
+  display: flex;
+  height: 18px;
+  width: 18px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  opacity: 0.42;
+  color: inherit;
+  transition: opacity 0.18s ease, background-color 0.18s ease;
+}
+.tl-x:hover {
+  opacity: 1;
+  background: rgba(31, 35, 41, 0.09);
+}
+.dark .tl-scope .tl-x:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+.tl-x--onprimary {
+  color: #fff;
+}
+.tl-x--onprimary:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.26);
+}
+
+/* ---------- V1 滑标 Slider (SoybeanAdmin 原生 slider 语言) ---------- */
+.tv1 {
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px;
+}
+.tv1-tab {
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 8px;
+}
+.tv1-tab:hover {
+  background: var(--tl-hover);
+  color: var(--tl-ink);
+}
+.tv1-tab--active,
+.tv1-tab--active:hover {
+  background: var(--tl-tint);
+  color: var(--primary);
+}
+.tv1-tab--active:hover {
+  background: var(--tl-tint-hover);
+}
+.tv1-slider {
+  position: absolute;
+  left: 5px;
+  top: 50%;
+  width: 3px;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--primary);
+  transform: translateY(-50%);
+  animation: tv1-pop 0.24s cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+@keyframes tv1-pop {
+  from {
+    transform: translateY(-50%) scaleY(0.3);
+    opacity: 0;
+  }
+}
+
+/* ---------- V2 实底 Button (SoybeanAdmin button / Arco 实底语言) ---------- */
+.tv2 {
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+}
+.tv2-tab {
+  height: 30px;
+  padding: 0 13px;
+  border-radius: 7px;
+}
+.tv2-tab:hover:not(.tv2-tab--active) {
+  background: var(--tl-hover);
+  color: var(--tl-ink);
+}
+.tv2-tab--active,
+.tv2-tab--active:hover {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 1px 4px rgba(22, 93, 255, 0.35);
+}
+
+/* ---------- V3 卡片 Card (Arco/Element 经典卡片页签) ---------- */
+.tv3 {
+  background: var(--tl-track3);
+  border-bottom: 1px solid var(--divider);
+}
+.tv3-tab {
+  height: 100%;
+  padding: 0 15px;
+  border-left: 1px solid var(--divider);
+}
+.tv3-tab:first-child {
+  border-left: none;
+}
+.tv3-tab:hover:not(.tv3-tab--active) {
+  background: rgba(31, 35, 41, 0.035);
+  color: var(--tl-ink);
+}
+.dark .tl-scope .tv3-tab:hover:not(.tv3-tab--active) {
+  background: rgba(255, 255, 255, 0.05);
+}
+.tv3-tab--active,
+.tv3-tab--active:hover {
+  background: var(--card);
+  color: var(--primary);
+  font-weight: 600;
+}
+.tv3-tab--active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--primary);
+}
+
+/* ---------- V4 浮起 Float (VS Code / 编辑器材质: 灰轨道 + 白卡浮起) ---------- */
+.tv4 {
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px;
+  background: var(--tl-track);
+}
+.tv4-tab {
+  height: 32px;
+  padding: 0 13px;
+  border-radius: 8px;
+}
+.tv4-tab:hover:not(.tv4-tab--active) {
+  background: rgba(31, 35, 41, 0.06);
+  color: var(--tl-ink);
+}
+.dark .tl-scope .tv4-tab:hover:not(.tv4-tab--active) {
+  background: rgba(255, 255, 255, 0.08);
+}
+.tv4-tab--active,
+.tv4-tab--active:hover {
+  background: var(--card);
+  color: var(--tl-ink);
+  font-weight: 600;
+  box-shadow: var(--tl-float-shadow);
+}
+.dark .tl-scope .tv4-tab--active,
+.dark .tl-scope .tv4-tab--active:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* ---------- V5 墨块 Ink (Vercel 风: 墨色反转块) ---------- */
+.tv5 {
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+  background: var(--card);
+  border-bottom: 1px solid var(--divider);
+}
+.tv5-tab {
+  height: 32px;
+  padding: 0 13px;
+  border-radius: 8px;
+}
+.tv5-tab:hover:not(.tv5-tab--active) {
+  background: var(--tl-hover);
+  color: var(--tl-ink);
+}
+.tv5-tab--active,
+.tv5-tab--active:hover {
+  background: #1d2430;
+  color: #fff;
+  box-shadow: 0 2px 6px -1px rgba(13, 18, 26, 0.32);
+}
+.dark .tl-scope .tv5-tab--active,
+.dark .tl-scope .tv5-tab--active:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* ---------- V6 染色胶囊 Tint Chip (Notion 风: 品牌浅染 + 描边) ---------- */
+.tv6 {
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px;
+  background: var(--card);
+  border-bottom: 1px solid var(--divider);
+}
+.tv6-tab {
+  height: 30px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+.tv6-tab:hover:not(.tv6-tab--active) {
+  background: var(--tl-hover);
+  color: var(--tl-ink);
+}
+.tv6-tab--active,
+.tv6-tab--active:hover {
+  background: var(--tl-tint);
+  border-color: var(--tl-tint-bd);
+  color: var(--primary);
+}
+
+/* ---------- V7 分段 Segmented (Task 74 定版同款: 凹槽 + 滑动白卡) ---------- */
+.tv7 {
+  align-items: center;
+  padding: 0 10px;
+  background: var(--card);
+  border-bottom: 1px solid var(--divider);
+}
+.tv7-track {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+  height: 36px;
+  padding: 3px;
+  border-radius: 10px;
+  background: var(--tl-seg-track);
+  box-shadow:
+    inset 0 0 0 1px rgba(31, 35, 41, 0.05),
+    inset 0 1px 2px rgba(16, 24, 40, 0.05);
+}
+.dark .tl-scope .tv7-track {
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    inset 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+.tv7-tab {
+  position: relative;
+  z-index: 1;
+  height: 30px;
+  padding: 0 11px;
+  border-radius: 7px;
+}
+.tv7-tab:hover:not(.tv7-tab--active) {
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--tl-ink);
+}
+.dark .tl-scope .tv7-tab:hover:not(.tv7-tab--active) {
+  background: rgba(255, 255, 255, 0.1);
+}
+.tv7-tab--active,
+.tv7-tab--active:hover {
+  color: var(--tl-ink);
+  font-weight: 600;
+}
+.dark .tl-scope .tv7-tab--active svg {
+  color: color-mix(in srgb, var(--primary) 55%, #fff);
+}
+.tv7-thumb {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 0;
+  width: 0;
+  border-radius: 7px;
+  background: var(--card);
+  box-shadow: 0 1px 2.5px rgba(16, 24, 40, 0.16), 0 0 0 1px rgba(16, 24, 40, 0.04);
+  pointer-events: none;
+}
+.dark .tl-scope .tv7-thumb {
+  background: rgba(255, 255, 255, 0.13);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+.tv7-thumb--ready {
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---------- 动效弱化 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .tl-tab,
+  .tv1-slider {
+    animation: none;
+  }
+  .tl-tab,
+  .tl-x {
+    transition: none;
+  }
+  .tl-tab:active {
+    transform: none;
+  }
+}
