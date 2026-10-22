@@ -7,7 +7,7 @@ import { computed, defineComponent, onMounted, ref } from 'vue'
 import { NCard } from 'naive-ui'
 import { copyText } from '@/lib/utils'
 import { useUserStore } from '../stores'
-import { BookOpen, Terminal, ShieldCheck, Cpu, BarChart3, Copy, Check } from 'lucide-vue-next'
+import { BookOpen, Terminal, ShieldCheck, Cpu, BarChart3, Copy, Check, Heart } from 'lucide-vue-next'
 
 export default defineComponent({
   name: 'AboutPage',
@@ -108,7 +108,7 @@ print(resp.choices[0].message.content)`
 
     return {
       user, about, origin, loading, openaiCode, claudeCode, pythonCode, copyCode, copiedLang, endpoints, aboutBlocks,
-      NCard, BookOpen, Terminal, ShieldCheck, Cpu, BarChart3, Copy, Check,
+      NCard, BookOpen, Terminal, ShieldCheck, Cpu, BarChart3, Copy, Check, Heart,
     }
   },
   template: `
@@ -224,6 +224,24 @@ print(resp.choices[0].message.content)`
               <span class="text-[11px] text-muted-foreground">{{ desc }}</span>
             </div>
           </div>
+        </div>
+      </div>
+    </n-card>
+
+    <!-- 赞助支持 -->
+    <n-card size="small" class="mt-4">
+      <template #header><span class="flex items-center gap-2 text-sm font-semibold"><heart :size="16" style="color: #ef4444" /> 赞助支持</span></template>
+      <div class="flex flex-col items-center gap-3 py-1 text-center">
+        <p class="text-xs text-muted-foreground">如果本项目对你有帮助，欢迎请作者喝杯咖啡 ☕ 你的赞助是持续维护更新的动力</p>
+        <div class="flex flex-wrap items-center justify-center gap-6">
+          <figure class="flex flex-col items-center gap-1.5">
+            <img src="/images/sponsor-alipay.jpg" alt="支付宝收款码" class="h-40 w-28 rounded-lg border border-[var(--border)] object-cover" />
+            <figcaption class="text-[11px] text-muted-foreground">支付宝</figcaption>
+          </figure>
+          <figure class="flex flex-col items-center gap-1.5">
+            <img src="/images/sponsor-wechat.png" alt="微信赞赏码" class="h-40 w-40 rounded-lg border border-[var(--border)] object-contain" />
+            <figcaption class="text-[11px] text-muted-foreground">微信赞赏</figcaption>
+          </figure>
         </div>
       </div>
     </n-card>
