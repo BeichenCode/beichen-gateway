@@ -2,6 +2,8 @@
 
 一个开箱即用的 LLM 网关与 API 资产管理系统：统一 OpenAI 兼容接口、多渠道调度、令牌计费、多用户体系，全部自托管，数据不出你的服务器。
 
+🖥️ **在线演示**：[bz.013.ltd](https://bz.013.ltd/)
+
 > 本项目参考 [QuantumNous/new-api](https://github.com/QuantumNous/new-api)（AGPL-3.0）的功能语义，以 Next.js / TypeScript 重新实现；new-api 的血统源自 [songquanpeng/one-api](https://github.com/songquanpeng/one-api)（MIT）。本项目与 new-api 官方无关，其名称与 Logo 均归原项目所有。
 
 ## 功能特性
@@ -107,3 +109,13 @@ npm run build && npm start
 - [QuantumNous/new-api](https://github.com/QuantumNous/new-api) — 功能语义参考
 - [songquanpeng/one-api](https://github.com/songquanpeng/one-api) — 网关设计思路源头
 - [Vercel](https://vercel.com) / Next.js、[Prisma](https://www.prisma.io)、[shadcn/ui](https://ui.shadcn.com)、[Arco Design](https://arco.design) 等开源社区
+
+## 赞助支持
+
+如果这个项目对你有帮助，欢迎请作者喝杯咖啡 ☕ 你的赞助是持续维护和更新的动力。
+
+| 支付宝 | 微信赞赏 |
+|:---:|:---:|
+| <img src="docs/images/sponsor-alipay.jpg" width="240" alt="支付宝收款码"/> | <img src="docs/images/sponsor-wechat.png" width="240" alt="微信赞赏码"/> |
+
+> 扫码时请备注 GitHub ID 或留下昵称，感谢每一位支持者 ❤️
