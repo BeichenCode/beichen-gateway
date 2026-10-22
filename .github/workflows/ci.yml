@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: 类型检查 & 构建
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 配置 Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: Prisma 初始化（建库 + 生成客户端）
+        run: |
+          npx prisma db push
+          npx prisma generate
+        env:
+          DATABASE_URL: "file:./db/custom.db"
+
+      - name: TypeScript 类型检查
+        run: npx tsc --noEmit
+
+      - name: Next.js 构建
+        run: npm run build
+        env:
+          DATABASE_URL: "file:./db/custom.db"
