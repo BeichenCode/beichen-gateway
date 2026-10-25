@@ -1,5 +1,5 @@
 /**
- * 数据库种子: root 账号 / 默认系统设置 / 常见模型定价
+ * 数据库种子: 默认管理员账号 / 默认系统设置 / 常见模型定价
  * 运行: bun scripts/seed.ts
  */
 import { PrismaClient } from '@prisma/client'
@@ -29,14 +29,14 @@ function genKey(prefix = ''): string {
 async function main() {
   console.log('Seeding...')
 
-  // ---- root 账号 ----
-  const root = await prisma.user.upsert({
-    where: { username: 'root' },
+  // ---- 默认管理员账号 ----
+  const admin = await prisma.user.upsert({
+    where: { username: 'admin' },
     update: {},
     create: {
-      username: 'root',
-      password: hashPassword('123456'),
-      displayName: 'Root',
+      username: 'admin',
+      password: hashPassword('admin123'),
+      displayName: 'Admin',
       role: 100,
       status: 1,
       quota: 100000000000n,
@@ -44,16 +44,16 @@ async function main() {
       affCode: genAffCode(),
     },
   })
-  console.log('root user ready:', root.username)
+  console.log('admin user ready:', admin.username, '(默认密码 admin123, 首次登录后请立即修改)'
 
   // ---- 默认系统设置 ----
   const defaultOptions: Record<string, string> = {
-    SystemName: 'New API Gateway',
+    SystemName: '北辰中转站',
     Logo: '',
     ServerAddress: '',
     FooterHTML: '',
-    Announcement: '欢迎使用 New API Gateway，支持 OpenAI / Claude 兼容接口，多渠道负载均衡。',
-    About: '## 关于\n\n本项目是对标 New API 的大模型网关与资产管理系统。\n\n- 统一 OpenAI 兼容接口\n- 多渠道负载均衡与故障转移\n- 精细计费与额度管理',
+    Announcement: '欢迎使用北辰中转站！统一 OpenAI / Claude 兼容接口，多渠道负载均衡。默认管理员：admin / admin123（首次登录后请立即修改密码）。',
+    About: '## 关于\n\n北辰中转站是自托管的 LLM 网关与 API 资产管理系统。\n\n- 统一 OpenAI 兼容接口\n- 多渠道负载均衡与故障转移\n- 精细计费与额度管理',
     RegisterEnabled: 'true',
     EmailVerificationEnabled: 'false',
     GitHubOAuthEnabled: 'false',
