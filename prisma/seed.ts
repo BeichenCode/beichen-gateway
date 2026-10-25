@@ -44,7 +44,7 @@ async function main() {
       affCode: genAffCode(),
     },
   })
-  console.log('admin user ready:', admin.username, '(默认密码 admin123, 首次登录后请立即修改)'
+  console.log('admin user ready:', admin.username, '(默认密码 admin123, 首次登录后请立即修改)')
 
   // ---- 默认系统设置 ----
   const defaultOptions: Record<string, string> = {
