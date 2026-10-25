@@ -68,6 +68,8 @@ export default defineComponent({
   components: { EmptyState },
   setup() {
     const userStore = useUserStore()
+    // Task 204 修复: setup 挂载窄屏 composable (此前仅定义未调用, tsc 报 isNarrow 未定义)
+    const isNarrow = useNarrow()
     const user = () => userStore.user
     const redeemKey = ref('')
     const redeeming = ref(false)
