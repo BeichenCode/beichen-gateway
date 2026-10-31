@@ -88,6 +88,32 @@ npm run build && npm start
 # 未安装 bun 时可改用：NODE_ENV=production node .next/standalone/server.js
 ```
 
+### systemd 生产部署示例
+
+```ini
+[Unit]
+Description=Beichen Gateway
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/beichen-gateway
+ExecStart=/usr/bin/node /opt/beichen-gateway/.next/standalone/server.js
+Environment=NODE_ENV=production
+Environment=PORT=3000
+Environment=HOSTNAME=127.0.0.1
+Environment=DATABASE_URL=file:/opt/beichen-gateway/db/custom.db
+Environment=SESSION_SECRET=替换为openssl-rand-hex-32
+Environment=TZ=Asia/Shanghai
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+```
+
+> 建议：HOSTNAME 绑定 127.0.0.1 由 nginx/Caddy 反代并启用 HTTPS；`db/custom.db` 与 `.env` 权限收紧为 600。
+
 ### 默认管理员
 
 | 用户名 | 初始密码 |

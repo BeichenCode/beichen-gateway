@@ -4,7 +4,7 @@
  */
 import '../flags'
 import { defineComponent, h, onMounted, onBeforeUnmount, ref, watch , computed} from 'vue'
-import { NButton, NDataTable, NInput, NTag } from 'naive-ui'
+import { NButton, NDataTable, NInput, NSelect, NTag } from 'naive-ui'
 import type { DataTableColumns } from 'naive-ui'
 import { apiGet } from '@/lib/api'
 import { navigate } from '@/lib/router'
@@ -95,6 +95,18 @@ export default defineComponent({
     const loading = ref(true)
     const filters = ref({ type: '', modelName: '', tokenName: '', username: '', channelName: '' })
     const expandedKeys = ref<Array<number>>([])
+
+    // Task 178: 模型筛选改下拉直选 — 选项=当前已有日志的模型(带调用条数), 空值=全部模型不过滤; max-width 防窄屏溢出
+    const modelOptions = ref<Array<{ label: string; value: string }>>([])
+    const modelSelectOptions = computed(() => [{ label: '全部模型', value: '' }, ...modelOptions.value])
+    async function loadModelOptions() {
+      try {
+        const resp = await apiGet<{ data: Array<{ modelName: string; count: number }> }>('/api/console/log/models')
+        modelOptions.value = resp.data.map((m) => ({ label: `${m.modelName} (${m.count.toLocaleString()})`, value: m.modelName }))
+      } catch {
+        // 下拉数据源加载失败不阻塞日志列表, 退化为只有「全部模型」
+      }
+    }
     let debounceTimer: ReturnType<typeof setTimeout> | null = null
     let reqId = 0
 
@@ -120,7 +132,10 @@ export default defineComponent({
       }
     }
 
-    onMounted(() => void load())
+    onMounted(() => {
+      void load()
+      void loadModelOptions()
+    })
     onBeforeUnmount(() => {
       if (debounceTimer) clearTimeout(debounceTimer)
     })
@@ -510,9 +525,15 @@ export default defineComponent({
           </div>
         </div>
         <div class="flex flex-wrap items-center gap-2">
-          <n-input v-model:value="filters.modelName" size="small" placeholder="模型名称" clearable style="width: 160px">
-            <template #prefix><search :size="13" /></template>
-          </n-input>
+          <n-select
+            v-model:value="filters.modelName"
+            size="small"
+            :options="modelSelectOptions"
+            placeholder="全部模型"
+            clearable
+            filterable
+            style="width: 210px; max-width: 100%"
+          />
           <n-input v-model:value="filters.tokenName" size="small" placeholder="令牌名称" clearable style="width: 144px">
             <template #prefix><search :size="13" /></template>
           </n-input>

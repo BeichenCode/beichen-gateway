@@ -150,6 +150,38 @@ async function main() {
     })
   }
   console.log(`model ratios seeded: ${models.length}`)
+
+  // ---- 内置免费上游渠道 (Pollinations 匿名层, 开箱即用无需真实密钥) ----
+  const freeModels: Array<[string, string]> = [
+    ['openai-fast', 'Pollinations 免费上游 GPT-OSS 20B (openai-fast, 实测延迟1-5s)'],
+    ['openai', 'Pollinations 免费上游 GPT-OSS 20B (别名 openai)'],
+    ['gpt-oss', 'Pollinations 免费上游 GPT-OSS 20B (别名 gpt-oss)'],
+  ]
+  for (const [name, description] of freeModels) {
+    await prisma.modelRatio.upsert({
+      where: { modelName: name },
+      update: {},
+      create: { modelName: name, ratio: 0, completionRatio: 1, modelPrice: -1, description, quotaType: 0 },
+    })
+  }
+  const freeChannel = await prisma.channel.findFirst({ where: { name: 'Pollinations' } })
+  if (!freeChannel) {
+    await prisma.channel.create({
+      data: {
+        name: 'Pollinations',
+        type: 1,
+        baseUrl: 'https://text.pollinations.ai/v1',
+        key: 'sk-pollinations-free-anonymous',
+        models: 'openai-fast,openai,gpt-oss',
+        groups: 'default',
+        priority: 1,
+        weight: 5,
+        status: 1,
+        remark: '内置免费上游, 匿名层无需真实密钥, 计费倍率 0',
+      },
+    })
+    console.log('free channel seeded: Pollinations (openai-fast / openai / gpt-oss, 倍率 0)')
+  }
 }
 
 main()
