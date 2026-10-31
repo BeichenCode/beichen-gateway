@@ -17,6 +17,28 @@
 - **官网落地页**：默认启用企业版官网落地页，另预留多套模板设计稿（暗夜版 / 网关版 / 云服务版 / 字报版等）可自行接入
 - **部署友好**：默认 SQLite 零依赖开箱即用，支持切换 MySQL 等生产数据库
 
+## 界面预览
+
+> 截图取自本地演示环境，渠道密钥均为演示占位数据。
+
+<table>
+  <tr>
+    <td align="center" width="33%"><img src="docs/screenshots/shot-home.png" alt="官网首页"/><br/><b>官网首页</b></td>
+    <td align="center" width="33%"><img src="docs/screenshots/shot-login.png" alt="登录页"/><br/><b>登录页 · 站点公告</b></td>
+    <td align="center" width="33%"><img src="docs/screenshots/shot-dashboard.png" alt="数据看板"/><br/><b>数据看板</b></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/screenshots/shot-gateway.png" alt="网关信息"/><br/><b>网关信息 · 接入点与示例代码</b></td>
+    <td align="center"><img src="docs/screenshots/shot-channels.png" alt="渠道管理"/><br/><b>渠道管理 · 多渠道路由</b></td>
+    <td align="center"><img src="docs/screenshots/shot-tokens.png" alt="令牌管理"/><br/><b>令牌管理</b></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/screenshots/shot-pricing.png" alt="模型价格"/><br/><b>模型价格 · 倍率计费</b></td>
+    <td align="center"><img src="docs/screenshots/shot-users.png" alt="用户管理"/><br/><b>用户管理</b></td>
+    <td align="center"><img src="docs/screenshots/shot-settings.png" alt="系统设置"/><br/><b>系统设置</b></td>
+  </tr>
+</table>
+
 ## 技术栈
 
 Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · Prisma 6 · shadcn/ui · Arco Design · Vue 3 控制台组件层 · ECharts
